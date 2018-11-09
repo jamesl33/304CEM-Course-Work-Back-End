@@ -1,0 +1,22 @@
+{
+    "name": "304CEM-Course-Work-Back-End",
+    "version": "0.1.0",
+    "description": "Font end for a simple react/redux recipe blog",
+    "main": "index.js",
+    "scripts": {
+        "lint": "for _file in $(find . -type f -not -path './node_modules*' -name '*.js' -o -name '*.jsx'); do ./node_modules/.bin/eslint $_file; done"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git@github.coventry.ac.uk:leej64/304CEM-Course-Work-Back-End.git"
+    },
+    "keywords": [],
+    "author": "James Lee",
+    "license": "GPL-3.0-or-later",
+    "dependencies": {
+        "express": "^4.16.4"
+    },
+    "devDependencies": {
+        "eslint": "^5.9.0"
+    }
+}
