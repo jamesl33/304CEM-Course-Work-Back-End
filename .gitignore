@@ -1,0 +1,2 @@
+# Ignore the database; it doesn't need to be in git
+*.sqlite3

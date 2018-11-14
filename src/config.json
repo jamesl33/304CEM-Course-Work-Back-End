@@ -1,0 +1,6 @@
+{
+    "bcrypt": { "saltRounds": 10 },
+    "database": { "name": "RecipeBlog.sqlite3" },
+    "jwt": { "jwtSecret": "ReCiPeBlOgSeCrEt" },
+    "server": { "port": 8080 }
+}

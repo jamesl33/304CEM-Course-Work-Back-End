@@ -4,7 +4,9 @@
     "description": "Font end for a simple react/redux recipe blog",
     "main": "index.js",
     "scripts": {
-        "lint": "for _file in $(find . -type f -not -path './node_modules*' -name '*.js' -o -name '*.jsx'); do ./node_modules/.bin/eslint $_file; done"
+        "dev": "nodemon index.js",
+        "lint": "for _file in $(find . -type f -not -path './node_modules*' -name '*.js' -o -name '*.jsx'); do ./node_modules/.bin/eslint $_file; done",
+        "start": "node index.js || nodejs index.js || echo 'You must install Nodejs'"
     },
     "repository": {
         "type": "git",
@@ -14,9 +16,18 @@
     "author": "James Lee",
     "license": "GPL-3.0-or-later",
     "dependencies": {
-        "express": "^4.16.4"
+        "bcrypt": "^3.0.0",
+        "better-sqlite3": "^5.0.1",
+        "cors": "^2.8.5",
+        "express": "^4.16.4",
+        "jsonwebtoken": "^8.3.0",
+        "passport": "^0.4.0",
+        "passport-jwt": "^4.0.0",
+        "passport-local": "^1.0.0"
     },
     "devDependencies": {
-        "eslint": "^5.9.0"
+        "eslint": "^5.9.0",
+        "jsdoc": "^3.5.5",
+        "nodemon": "^1.18.6"
     }
 }
