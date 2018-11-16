@@ -13,13 +13,12 @@ module.exports = {
                 if (db.prepare('select * from users where (username) = ?').get(user.username)) {
                     reject(new Error('Username already taken'))
                 } else {
-                    db.prepare('insert into users values (?, ?, ?, ?, ?, ?)').run(
+                    db.prepare('insert into users values (?, ?, ?, ?, ?)').run(
                         0,
                         user.username,
                         user.name,
                         user.email,
                         bcrypt.hashSync(user.password, config.bcrypt.saltRounds),
-                        150000000,
                     )
 
                     db.close()
