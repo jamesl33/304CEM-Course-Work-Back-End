@@ -1,2 +1,8 @@
 # Ignore the database; it doesn't need to be in git
 *.sqlite3
+
+# Ignore the public folder; it also doesn't need to be saved
+public/
+
+# Ignore my TODO files
+*.org

@@ -7,15 +7,16 @@ const cors = require('cors')
 const express = require('express');
 const passport = require('passport')
 const config = require('./src/config.json')
+const multer = require('multer')
 
 const app = express();
 
 app.use(cors())
 app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({extended: true}))
+app.use(multer({ dest: 'public/images/uploads' }).array('images'))
 app.use(passport.initialize())
 
-app.use(express.static('./public'))
+app.use(express.static('public'))
 
 const routes = (require('./src/routes'))
 
