@@ -24,7 +24,7 @@ router.post('/login', (req, res) => {
 
 router.post('/register', (req, res) => {
     if (req.body.username && req.body.name && req.body.password && req.body.email) {
-        database.addUser(req.body, (err, user) => {
+        database.user.add(req.body, (err, user) => {
             if (err) {
                 res.status(401).send({
                     message: err.message

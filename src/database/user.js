@@ -5,7 +5,7 @@ const sqlite = require('better-sqlite3')
 const config = require('../config.json')
 
 module.exports = {
-    addUser: async(user, done) => {
+    add: async(user, done) => {
         try {
             const newUser = await new Promise((resolve, reject) => {
                 const db = new sqlite(config.database.name)
@@ -13,8 +13,10 @@ module.exports = {
                 if (db.prepare('select * from users where (username) = ?').get(user.username)) {
                     reject(new Error('Username already taken'))
                 } else {
+                    const previousId = db.prepare('select max(id) as previousId from users').get()
+
                     db.prepare('insert into users values (?, ?, ?, ?, ?)').run(
-                        0,
+                        previousId.previousId !== null ? previousId.previousId + 1 : 0,
                         user.username,
                         user.name,
                         user.email,
@@ -36,7 +38,7 @@ module.exports = {
             }
         }
     },
-    verifyUser: async(user, done) => {
+    verify: async(user, done) => {
         try {
             const verifiedUser = await new Promise((resolve, reject) => {
                 const db = new sqlite(config.database.name)

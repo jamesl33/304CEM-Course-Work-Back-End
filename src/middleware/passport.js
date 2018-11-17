@@ -9,7 +9,7 @@ const database = require('../database')
 const config = require('../config.json')
 
 passport.use(new LocalStrategy((username, password, done) => {
-    database.verifyUser({ username: username, password: password }, (err, result) => {
+    database.user.verify({ username: username, password: password }, (err, result) => {
         if (err) {
             done(err)
         } else {
