@@ -15,11 +15,13 @@ function _formDataToRecipe(body, files) {
         }
     })
 
+    recipe.image = files[0].path
+
     const steps = JSON.parse(body.steps)
 
     for (let i = 0; i < steps.length; i++) {
         recipe.steps.push({
-            image: steps[i].image ? files[i].path : undefined, // I need to support optional images per step
+            image: steps[i].image ? files[i + 1].path : undefined, // I need to support optional images per step
             description: steps[i].description
         })
     }

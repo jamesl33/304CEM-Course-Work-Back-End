@@ -10,10 +10,11 @@ async function _save(user, recipe, publish) {
             const userId = db.prepare('select id from users where name = ?').get(user.name)
             const previousId = db.prepare('select max(id) as previousId from recipes').get()
 
-            db.prepare('insert into recipes values (?, ?, ?, ?, ?, ?)').run(
+            db.prepare('insert into recipes values (?, ?, ?, ?, ?, ?, ?)').run(
                 previousId.previousId !== null ? previousId.previousId + 1 : 0,
                 userId.id,
                 recipe.title,
+                recipe.image,
                 recipe.description,
                 JSON.stringify(recipe.steps),
                 publish ? 1 : 0,
