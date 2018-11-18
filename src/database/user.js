@@ -53,7 +53,7 @@ module.exports = {
 
                 if (bcrypt.compareSync(user.password, dbUser.passwordHash)) {
                     resolve({
-                        name: dbUser.name,
+                        name: dbUser.name
                     })
                 } else {
                     reject(new Error('Incorrect password'))

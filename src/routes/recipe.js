@@ -15,15 +15,22 @@ function _formDataToRecipe(body, files) {
         }
     })
 
-    recipe.image = files[0].path
+    if (body.image) {
+        recipe.image = files[0].path
+        files.splice(0, 1)
+    }
 
     const steps = JSON.parse(body.steps)
 
     for (let i = 0; i < steps.length; i++) {
         recipe.steps.push({
-            image: steps[i].image ? files[i + 1].path : undefined, // I need to support optional images per step
+            image: steps[i].image ? files[0].path : undefined, // I need to support optional images per step
             description: steps[i].description
         })
+
+        if (steps[i].image) {
+            files.splice(0, 1)
+        }
     }
 
     return recipe
@@ -31,43 +38,84 @@ function _formDataToRecipe(body, files) {
 
 router.post('/save', (req, res) => {
     passport.authenticate('jwt', (err, user) => {
-        if (err) {
+        if (err || user === false) {
             res.status(401).send({
-                message: err.message
+                message: err ? err.message : 'Unauthorized'
             })
         } else {
             database.recipe.save(user, _formDataToRecipe(req.body, req.files))
-            res.status(200).send() // Notify that the recipe was saved correctly
+            // Notify the user that the resource was created successfully
+            res.status(201).send()
+        }
+    })(req, res)
+})
+
+router.post('/load', (req, res) => {
+    passport.authenticate('jwt', (err, user) => {
+        if (err || user === false) {
+            res.status(401).send({
+                message: err ? err.message : 'Unauthorized'
+            })
+        } else {
+            database.recipe.load(user, req.body.id, (err, recipe) => {
+                if (err) {
+                    // The user doesn't have access to this recipe or it doesn't exist
+                    res.status(403).send({
+                        message: err ? err.message : 'Unauthorized'
+                    })
+                } else {
+                    res.send(recipe)
+                }
+            })
         }
     })(req, res)
 })
 
 router.post('/publish', (req, res) => {
     passport.authenticate('jwt', (err, user) => {
-        if (err) {
+        if (err || user === false) {
             res.status(401).send({
-                message: err.message
+                message: err ? err.message : 'Unauthorized'
             })
         } else {
-
-            // database.recipe.togglePublished({id: 1})
-
             database.recipe.publish(user, _formDataToRecipe(req.body, req.files))
-            res.status(200).send() // Notify that the recipe was published correctly
-            // TODO - Redirect the user to the publish recipe
+            // Notify the user that the resource was created successfully
+            res.status(201).send()
+        }
+    })(req, res)
+})
+
+router.post('/update', (req, res) => {
+    passport.authenticate('jwt', (err, user) => {
+        if (err || user === false) {
+            res.status(401).send({
+                message: err ? err.message : 'Unauthorized'
+            })
+        } else {
+            database.recipe.update(user, _formDataToRecipe(req.body, req.files), (err) => {
+                if (err) {
+                    // The user doesn't have access to this recipe or it doesn't exist
+                    res.status(403).send({
+                        message: err.message
+                    })
+                } else {
+                    // Notify the user that the resource was updated successfully
+                    res.status(201).send()
+                }
+            })
         }
     })(req, res)
 })
 
 router.post('/publish/toggle', (req, res) => {
     passport.authenticate('jwt', (err, user) => {
-        if (err) {
+        if (err || user === false) {
             res.status(401).end({
-                message: err.message
+                message: err ? err.message : 'Unauthorized'
             })
         } else {
-            database.recipe.togglePublished(user, _formDataToRecipe(req.body, req.files))
-            res.status(200).send() // Notify that the recipe was published/unpublished correctly
+            // Notify the user that the resource was updated successfully
+            res.status(201).send()
         }
     })(req, res)
 })
