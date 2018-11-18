@@ -50,14 +50,14 @@ router.post('/save', (req, res) => {
     })(req, res)
 })
 
-router.post('/load', (req, res) => {
+router.post('/edit', (req, res) => {
     passport.authenticate('jwt', (err, user) => {
         if (err || user === false) {
             res.status(401).send({
                 message: err ? err.message : 'Unauthorized'
             })
         } else {
-            database.recipe.load(user, req.body.id, (err, recipe) => {
+            database.recipe.edit(user, req.body.id, (err, recipe) => {
                 if (err) {
                     // The user doesn't have access to this recipe or it doesn't exist
                     res.status(403).send({

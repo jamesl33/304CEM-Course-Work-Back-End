@@ -34,7 +34,7 @@ module.exports = {
     save: (user, recipe) => {
         return _save(user, recipe, false)
     },
-    load: async(user, id, done) => {
+    edit: async(user, id, done) => {
         try {
             const recipe = await new Promise((resolve, reject) => {
                 const db = new sqlite(config.database.name)
