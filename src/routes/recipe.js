@@ -146,4 +146,30 @@ router.post('/load', (req, res) => {
     })(req, res)
 })
 
+router.post('/recent', (req, res) => {
+    // Since this is for the home page we don't need to authenticate
+    database.recipe.recent((err, recipes) => {
+        if (err) {
+            res.status(403).send({
+                message: err ? err.message : 'Unauthorized'
+            })
+        } else {
+            res.send(recipes)
+        }
+    })
+})
+
+router.post('/top', (req, res) => {
+    // Since this is for the home page we don't need to authenticate
+    database.recipe.top((err, recipes) => {
+        if (err) {
+            res.status(403).send({
+                message: err ? err.message : 'Unauthorized'
+            })
+        } else {
+            res.send(recipes)
+        }
+    })
+})
+
 module.exports = router

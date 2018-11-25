@@ -190,5 +190,30 @@ module.exports = {
         } catch (error) {
             done(error)
         }
+    },
+    recent: async(done) => {
+        try {
+            const recipes = await new Promise((resolve, reject) => {
+                // TODO - Add time stamps to recipes
+                // TODO - Implement this feature
+            })
+
+            done(null, recipes)
+        } catch (error) {
+            done(error)
+        }
+    },
+    top: async(done) => {
+        try {
+            const recipes = await new Promise((resolve, reject) => {
+                // TODO - Add ratings to recipes
+                // TODO - Implement this feature
+
+            })
+
+            done(null, recipes)
+        } catch (error) {
+            done(error)
+        }
     }
 }
