@@ -110,13 +110,39 @@ router.post('/update', (req, res) => {
 router.post('/publish/toggle', (req, res) => {
     passport.authenticate('jwt', (err, user) => {
         if (err || user === false) {
-            res.status(401).end({
+            res.status(401).send({
                 message: err ? err.message : 'Unauthorized'
             })
         } else {
-            // Notify the user that the resource was updated successfully
-            res.status(201).send()
+            database.recipe.togglePublished(user, req.body.id, (err) => {
+                if (err) {
+                    res.status(401).send({
+                        message: err.message
+                    })
+                } else {
+                    // Notify the user that the resource was updated successfully
+                    res.status(201).send()
+                }
+            })
         }
+    })(req, res)
+})
+
+router.post('/load', (req, res) => {
+    passport.authenticate('jwt', (err, user) => {
+        if (err) {
+            console.log(err)
+        }
+
+        database.recipe.load(user, req.body.id, (err, recipe) => {
+            if (err) {
+                res.status(403).send({
+                    message: err ? err.message : 'Unauthorized'
+                })
+            } else {
+                res.send(recipe)
+            }
+        })
     })(req, res)
 })
 

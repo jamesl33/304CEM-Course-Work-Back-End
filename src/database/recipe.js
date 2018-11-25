@@ -15,8 +15,8 @@ async function _save(user, recipe, publish) {
                 dbUser.id,
                 recipe.title,
                 recipe.image,
-                recipe.description,
                 recipe.ingredients,
+                recipe.description,
                 JSON.stringify(recipe.steps),
                 publish ? 1 : 0,
             )
@@ -56,14 +56,17 @@ module.exports = {
                 db.close()
 
                 resolve({
-                    id: dbRecipe.id,
-                    title: dbRecipe.title,
-                    description: dbRecipe.description,
-                    ingredients: dbRecipe.ingredients,
-                    steps: JSON.parse(dbRecipe.steps).map(step => {
-                        delete step.image
-                        return step
-                    })
+                    recipe: {
+                        id: dbRecipe.id,
+                        title: dbRecipe.title,
+                        description: dbRecipe.description,
+                        ingredients: dbRecipe.ingredients,
+                        steps: JSON.parse(dbRecipe.steps).map(step => {
+                            delete step.image
+                            return step
+                        })
+                    },
+                    published: dbRecipe.published
                 })
             })
 
@@ -75,7 +78,7 @@ module.exports = {
     publish: (user, recipe) => {
         return _save(user, recipe, true)
     },
-    update: async(user, recipe) => {
+    update: async(user, recipe, done) => {
         function newSteps(originalSteps, newSteps) {
             for (let i = 0; i < newSteps.length; i++) {
                 if (newSteps[i].image === undefined) {
@@ -135,19 +138,57 @@ module.exports = {
             done(error)
         }
     },
-    togglePublished: async(recipe) => {
+    togglePublished: async(user, id, done) => {
         try {
             await new Promise((resolve) => {
                 const db = new sqlite(config.database.name)
+                const dbUser = db.prepare('select * from users where name = ?').get(user.name)
+                const dbRecipe = db.prepare('select * from recipes where id = ?').get(id)
 
-                db.prepare('update recipes set published = not published where id = ?').run(recipe.id)
+                if (dbRecipe.createdBy == dbUser.id) {
+                    db.prepare('update recipes set published = not published where id = ?').run(id)
+                } else {
+                    reject(new Error('You do not own this recipe'))
+                }
 
                 db.close()
 
                 resolve()
             })
+
+            done(null)
         } catch (error) {
-            console.log(error) // We shouldn't need to send this to the user. Hense no callback.
+            done(error)
+        }
+    },
+    load: async(user, id, done) => {
+        try {
+            const recipe = await new Promise((resolve, reject) => {
+                const db = new sqlite(config.database.name)
+                const dbUser = db.prepare('select * from users where name = ?').get(user.name)
+                const dbRecipe = db.prepare('select * from recipes where id = ?').get(id)
+
+                if (!dbRecipe) {
+                    return reject(new Error('Requested recipe does not exit'))
+                }
+
+                if (!dbRecipe.published && dbUser.id != dbRecipe.createdBy) {
+                    return reject(new Error('Requested recipe does not exit'))
+                }
+
+                resolve({
+                    id: dbRecipe.id,
+                    title: dbRecipe.title,
+                    image: dbRecipe.image,
+                    ingredients: dbRecipe.ingredients,
+                    description: dbRecipe.description,
+                    steps: dbRecipe.steps
+                })
+            })
+
+            done(null, recipe)
+        } catch (error) {
+            done(error)
         }
     }
 }
