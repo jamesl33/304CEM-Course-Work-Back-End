@@ -13,7 +13,7 @@ module.exports = Object.assign({}, {
         const db = new sqlite(config.database.name)
 
         db.prepare('create table users (id integer primary key not null, username text, name text, email text, passwordHash text)').run()
-        db.prepare('create table recipes (id integer primary key not null, createdBy integer not null, title text not null, image text not null, ingredients text not null, description text not null, steps text not null, published integer not null, foreign key(createdBy) references users(id))').run()
+        db.prepare('create table recipes (id integer primary key not null, createdBy integer not null, createdOn integer not null, title text not null, image text not null, ingredients text not null, description text not null, steps text not null, published integer not null, foreign key(createdBy) references users(id))').run()
 
         db.close()
     }

@@ -10,15 +10,16 @@ async function _save(user, recipe, publish) {
             const previousId = db.prepare('select max(id) as previousId from recipes').get()
             const dbUser = db.prepare('select * from users where name = ?').get(user.name)
 
-            db.prepare('insert into recipes values (?, ?, ?, ?, ?, ?, ?, ?)').run(
+            db.prepare('insert into recipes values (?, ?, ?, ?, ?, ?, ?, ?, ?)').run(
                 previousId.previousId !== null ? previousId.previousId + 1 : 0,
                 dbUser.id,
+                Math.floor(new Date() / 1000),
                 recipe.title,
                 recipe.image,
                 recipe.ingredients,
                 recipe.description,
                 JSON.stringify(recipe.steps),
-                publish ? 1 : 0,
+                publish ? 1 : 0
             )
 
             db.close()
@@ -194,8 +195,23 @@ module.exports = {
     recent: async(done) => {
         try {
             const recipes = await new Promise((resolve, reject) => {
-                // TODO - Add time stamps to recipes
-                // TODO - Implement this feature
+                const db = new sqlite(config.database.name)
+                const dbRecipes = db.prepare('select * from recipes where published = 1 order by createdOn desc').all()
+
+                const recipes = []
+
+                dbRecipes.forEach(recipe => {
+                    recipes.push({
+                        id: recipe.id,
+                        title: recipe.title,
+                        image: recipe.image,
+                        description: recipe.description
+                    })
+                })
+
+                resolve(recipes)
+
+                db.close()
             })
 
             done(null, recipes)
