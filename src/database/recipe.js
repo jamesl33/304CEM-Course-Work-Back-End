@@ -10,7 +10,7 @@ async function _save(user, recipe, publish) {
             const previousId = db.prepare('select max(id) as previousId from recipes').get()
             const dbUser = db.prepare('select * from users where name = ?').get(user.name)
 
-            db.prepare('insert into recipes values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').run(
+            db.prepare('insert into recipes values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').run(
                 previousId.previousId !== null ? previousId.previousId + 1 : 0,
                 dbUser.id,
                 Math.floor(new Date() / 1000),
@@ -20,7 +20,8 @@ async function _save(user, recipe, publish) {
                 recipe.description,
                 JSON.stringify(recipe.steps),
                 publish ? 1 : 0,
-                0
+                0, // likeRating
+                0 // reported
             )
 
             db.close()
@@ -184,7 +185,9 @@ module.exports = {
                     image: dbRecipe.image,
                     ingredients: dbRecipe.ingredients,
                     description: dbRecipe.description,
-                    steps: dbRecipe.steps
+                    steps: dbRecipe.steps,
+                    liked: dbUser ? JSON.parse(dbUser.likedRecipes).includes(id) : undefined,
+                    reported: dbRecipe.reported
                 })
             })
 
@@ -224,7 +227,7 @@ module.exports = {
         try {
             const recipes = await new Promise((resolve, reject) => {
                 const db = new sqlite(config.database.name)
-                const dbRecipes = db.prepare('select * from recipes where published = 1 order by rating asc limit 5').all()
+                const dbRecipes = db.prepare('select * from recipes where published = 1 order by likeRating desc limit 5').all()
 
                 const recipes = []
 
@@ -243,6 +246,85 @@ module.exports = {
             })
 
             done(null, recipes)
+        } catch (error) {
+            done(error)
+        }
+    },
+    like: async(user, id, done) => {
+        try {
+            await new Promise((resolve) => {
+                const db = new sqlite(config.database.name)
+                const dbUser = db.prepare('select * from users where name = ?').get(user.name)
+                const dbRecipe = db.prepare('select * from recipes where id = ?').get(id)
+
+                if (dbRecipe.createdBy == dbUser.id) {
+                    db.prepare('update recipes set likeRating = likeRating + 1 where id = ?').run(id)
+                    db.prepare('update users set likedRecipes = ? where id = ?').run(JSON.stringify(JSON.parse(dbUser.likedRecipes).concat([id])), dbUser.id)
+                } else {
+                    reject(new Error('You do not own this recipe'))
+                }
+
+                db.close()
+
+                resolve()
+            })
+
+            done(null)
+        } catch (error) {
+            done(error)
+        }
+    },
+    unlike: async(user, id, done) => {
+        try {
+            await new Promise((resolve) => {
+                const db = new sqlite(config.database.name)
+                const dbUser = db.prepare('select * from users where name = ?').get(user.name)
+                const dbRecipe = db.prepare('select * from recipes where id = ?').get(id)
+
+                if (dbRecipe.createdBy == dbUser.id) {
+                    db.prepare('update recipes set likeRating = likeRating - 1 where id = ?').run(id)
+
+                    let newLikedRecipes = JSON.parse(dbUser.likedRecipes)
+                    const index = newLikedRecipes.indexOf(`${id}`)
+
+                    if (index !== -1) {
+                        newLikedRecipes.splice(index, 1)
+                    }
+
+                    db.prepare('update users set likedRecipes = ? where id = ?').run(JSON.stringify(newLikedRecipes), dbUser.id)
+                } else {
+                    reject(new Error('You do not own this recipe'))
+                }
+
+                db.close()
+
+                resolve()
+            })
+
+            done(null)
+        } catch (error) {
+            done(error)
+        }
+    },
+    report: async(user, id, done) => {
+        try {
+            await new Promise((resolve) => {
+                const db = new sqlite(config.database.name)
+                const dbUser = db.prepare('select * from users where name = ?').get(user.name)
+                const dbRecipe = db.prepare('select * from recipes where id = ?').get(id)
+
+                if (dbRecipe.createdBy == dbUser.id) {
+                    db.prepare('update recipes set reported = 1 where id = ?').run(id)
+                } else {
+                    reject(new Error('You do not own this recipe'))
+                }
+
+                db.close()
+
+                resolve()
+            })
+
+            done(null)
         } catch (error) {
             done(error)
         }

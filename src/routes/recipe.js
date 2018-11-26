@@ -172,4 +172,70 @@ router.post('/top', (req, res) => {
     })
 })
 
+router.post('/like', (req, res) => {
+    passport.authenticate('jwt', (err, user) => {
+        if (err || user === false) {
+            res.status(401).send({
+                message: err ? err.message : 'Unauthorized'
+            })
+        } else {
+            database.recipe.like(user, req.body.id, (err) => {
+                if (err) {
+                    // The user doesn't have access to this recipe or it doesn't exist
+                    res.status(403).send({
+                        message: err.message
+                    })
+                } else {
+                    // Notify the user that the resource was updated successfully
+                    res.status(201).send()
+                }
+            })
+        }
+    })(req, res)
+})
+
+router.post('/unlike', (req, res) => {
+    passport.authenticate('jwt', (err, user) => {
+        if (err || user === false) {
+            res.status(401).send({
+                message: err ? err.message : 'Unauthorized'
+            })
+        } else {
+            database.recipe.unlike(user, req.body.id, (err) => {
+                if (err) {
+                    // The user doesn't have access to this recipe or it doesn't exist
+                    res.status(403).send({
+                        message: err.message
+                    })
+                } else {
+                    // Notify the user that the resource was updated successfully
+                    res.status(201).send()
+                }
+            })
+        }
+    })(req, res)
+})
+
+router.post('/report', (req, res) => {
+    passport.authenticate('jwt', (err, user) => {
+        if (err || user === false) {
+            res.status(401).send({
+                message: err ? err.message : 'Unauthorized'
+            })
+        } else {
+            database.recipe.report(user, req.body.id, (err) => {
+                if (err) {
+                    // The user doesn't have access to this recipe or it doesn't exist
+                    res.status(403).send({
+                        message: err.message
+                    })
+                } else {
+                    // Notify the user that the resource was updated successfully
+                    res.status(201).send()
+                }
+            })
+        }
+    })(req, res)
+})
+
 module.exports = router

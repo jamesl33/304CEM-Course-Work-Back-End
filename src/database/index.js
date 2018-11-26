@@ -12,8 +12,8 @@ module.exports = Object.assign({}, {
     createDatabase: () => {
         const db = new sqlite(config.database.name)
 
-        db.prepare('create table users (id integer primary key not null, username text, name text, email text, passwordHash text)').run()
-        db.prepare('create table recipes (id integer primary key not null, createdBy integer not null, createdOn integer not null, title text not null, image text not null, ingredients text not null, description text not null, steps text not null, published integer not null, rating integer not null, foreign key(createdBy) references users(id))').run()
+        db.prepare('create table users (id integer primary key not null, username text not null, name text not null, email text not null, passwordHash text not null, likedRecipes text not null)').run()
+        db.prepare('create table recipes (id integer primary key not null, createdBy integer not null, createdOn integer not null, title text not null, image text not null, ingredients text not null, description text not null, steps text not null, published integer not null, likeRating integer not null, reported integer not null, foreign key(createdBy) references users(id))').run()
 
         db.close()
     }

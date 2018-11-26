@@ -15,12 +15,13 @@ module.exports = {
                 } else {
                     const previousId = db.prepare('select max(id) as previousId from users').get()
 
-                    db.prepare('insert into users values (?, ?, ?, ?, ?)').run(
+                    db.prepare('insert into users values (?, ?, ?, ?, ?, ?)').run(
                         previousId.previousId !== null ? previousId.previousId + 1 : 0,
                         user.username,
                         user.name,
                         user.email,
                         bcrypt.hashSync(user.password, config.bcrypt.saltRounds),
+                        JSON.stringify([]) // Add an empty liked recipe list
                     )
 
                     db.close()
