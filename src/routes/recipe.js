@@ -238,4 +238,14 @@ router.post('/report', (req, res) => {
     })(req, res)
 })
 
+router.post('/search', (req, res) => {
+    database.recipe.search(req.body.query, (err, results) => {
+        if (err) {
+            res.status(500).send()
+        } else {
+            res.send(results)
+        }
+    })
+})
+
 module.exports = router

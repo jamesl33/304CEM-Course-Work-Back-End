@@ -329,5 +329,23 @@ module.exports = {
         } catch (error) {
             done(error)
         }
+    },
+    search: async(query, done) => {
+        try {
+            const results = await new Promise((resolve, reject) => {
+                const db = new sqlite(config.database.name)
+                const titleResults = db.prepare('select * from recipes where title like ?').all(query)
+                const descriptionResults = db.prepare('select * from recipes where description like ?').all(query)
+                const ingredientsResults = db.prepare('select * from recipes where ingredients like ?').all(query)
+
+                db.close()
+
+                resolve([].concat(titleResults, descriptionResults, ingredientsResults))
+            })
+
+            done(null, results)
+        } catch (err) {
+            done(error)
+        }
     }
 }
