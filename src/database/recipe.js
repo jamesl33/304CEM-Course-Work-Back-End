@@ -198,6 +198,7 @@ module.exports = {
                     description: dbRecipe.description,
                     steps: dbRecipe.steps,
                     liked: dbUser ? JSON.parse(dbUser.likedRecipes).includes(id) : undefined,
+                    likes: dbRecipe.likeRating,
                     reported: dbRecipe.reported,
                     views: dbRecipe.viewCount + 1, // Add one because this row was collected before we incremented the viewCount column
                     comments: JSON.stringify(comments)
@@ -270,12 +271,8 @@ module.exports = {
                 const dbUser = db.prepare('select * from users where name = ?').get(user.name)
                 const dbRecipe = db.prepare('select * from recipes where id = ?').get(id)
 
-                if (dbRecipe.createdBy == dbUser.id) {
-                    db.prepare('update recipes set likeRating = likeRating + 1 where id = ?').run(id)
-                    db.prepare('update users set likedRecipes = ? where id = ?').run(JSON.stringify(JSON.parse(dbUser.likedRecipes).concat([id])), dbUser.id)
-                } else {
-                    reject(new Error('You do not own this recipe'))
-                }
+                db.prepare('update recipes set likeRating = likeRating + 1 where id = ?').run(id)
+                db.prepare('update users set likedRecipes = ? where id = ?').run(JSON.stringify(JSON.parse(dbUser.likedRecipes).concat([id])), dbUser.id)
 
                 db.close()
 
@@ -294,20 +291,16 @@ module.exports = {
                 const dbUser = db.prepare('select * from users where name = ?').get(user.name)
                 const dbRecipe = db.prepare('select * from recipes where id = ?').get(id)
 
-                if (dbRecipe.createdBy == dbUser.id) {
-                    db.prepare('update recipes set likeRating = likeRating - 1 where id = ?').run(id)
+                db.prepare('update recipes set likeRating = likeRating - 1 where id = ?').run(id)
 
-                    let newLikedRecipes = JSON.parse(dbUser.likedRecipes)
-                    const index = newLikedRecipes.indexOf(`${id}`)
+                let newLikedRecipes = JSON.parse(dbUser.likedRecipes)
+                const index = newLikedRecipes.indexOf(`${id}`)
 
-                    if (index !== -1) {
-                        newLikedRecipes.splice(index, 1)
-                    }
-
-                    db.prepare('update users set likedRecipes = ? where id = ?').run(JSON.stringify(newLikedRecipes), dbUser.id)
-                } else {
-                    reject(new Error('You do not own this recipe'))
+                if (index !== -1) {
+                    newLikedRecipes.splice(index, 1)
                 }
+
+                db.prepare('update users set likedRecipes = ? where id = ?').run(JSON.stringify(newLikedRecipes), dbUser.id)
 
                 db.close()
 
