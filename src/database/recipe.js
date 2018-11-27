@@ -10,7 +10,7 @@ async function _save(user, recipe, publish) {
             const previousId = db.prepare('select max(id) as previousId from recipes').get()
             const dbUser = db.prepare('select * from users where name = ?').get(user.name)
 
-            db.prepare('insert into recipes values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').run(
+            db.prepare('insert into recipes values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').run(
                 previousId.previousId !== null ? previousId.previousId + 1 : 0,
                 dbUser.id,
                 Math.floor(new Date() / 1000),
@@ -21,7 +21,8 @@ async function _save(user, recipe, publish) {
                 JSON.stringify(recipe.steps),
                 publish ? 1 : 0,
                 0, // likeRating
-                0 // reported
+                0, // reported
+                0 // viewCount
             )
 
             db.close()
@@ -179,6 +180,8 @@ module.exports = {
                     return reject(new Error('Requested recipe does not exit'))
                 }
 
+                db.prepare('update recipes set viewCount = viewCount + 1 where id = ?').run(id) // Increment the view counter
+
                 resolve({
                     id: dbRecipe.id,
                     title: dbRecipe.title,
@@ -187,7 +190,8 @@ module.exports = {
                     description: dbRecipe.description,
                     steps: dbRecipe.steps,
                     liked: dbUser ? JSON.parse(dbUser.likedRecipes).includes(id) : undefined,
-                    reported: dbRecipe.reported
+                    reported: dbRecipe.reported,
+                    views: dbRecipe.viewCount + 1. // Add one because this row was collected before we incremented the viewCount column
                 })
             })
 
