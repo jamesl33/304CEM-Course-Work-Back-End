@@ -171,6 +171,12 @@ module.exports = {
                 const db = new sqlite(config.database.name)
                 const dbUser = db.prepare('select * from users where name = ?').get(user.name)
                 const dbRecipe = db.prepare('select * from recipes where id = ?').get(id)
+                const comments = db.prepare('select * from comments where recipeId = ?').all(id)
+
+                comments.map(comment => {
+                    // This could propably be done in the sql statement; I just don't know how
+                    comment.createdBy = db.prepare('select name from users where id = ?').get(comment.createdBy).name
+                })
 
                 if (!dbRecipe) {
                     return reject(new Error('Requested recipe does not exit'))
@@ -191,7 +197,8 @@ module.exports = {
                     steps: dbRecipe.steps,
                     liked: dbUser ? JSON.parse(dbUser.likedRecipes).includes(id) : undefined,
                     reported: dbRecipe.reported,
-                    views: dbRecipe.viewCount + 1. // Add one because this row was collected before we incremented the viewCount column
+                    views: dbRecipe.viewCount + 1, // Add one because this row was collected before we incremented the viewCount column
+                    comments: JSON.stringify(comments)
                 })
             })
 
@@ -314,14 +321,9 @@ module.exports = {
         try {
             await new Promise((resolve) => {
                 const db = new sqlite(config.database.name)
-                const dbUser = db.prepare('select * from users where name = ?').get(user.name)
                 const dbRecipe = db.prepare('select * from recipes where id = ?').get(id)
 
-                if (dbRecipe.createdBy == dbUser.id) {
-                    db.prepare('update recipes set reported = 1 where id = ?').run(id)
-                } else {
-                    reject(new Error('You do not own this recipe'))
-                }
+                db.prepare('update recipes set reported = 1 where id = ?').run(id)
 
                 db.close()
 
