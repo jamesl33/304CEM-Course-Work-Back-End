@@ -174,6 +174,8 @@ module.exports = {
                 const comments = db.prepare('select * from comments where recipeId = ?').all(id)
 
                 comments.map(comment => {
+                    // This will be removed when stringifying
+                    comment.id = undefined
                     // This could propably be done in the sql statement; I just don't know how
                     comment.createdBy = db.prepare('select name from users where id = ?').get(comment.createdBy).name
                 })
