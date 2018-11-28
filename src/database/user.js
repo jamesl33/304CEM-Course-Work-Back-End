@@ -35,9 +35,7 @@ module.exports = {
 
             done(null, newUser)
         } catch (error) {
-            if (error) {
-                done(error)
-            }
+            done(error)
         }
     },
     verify: async(user, done) => {
@@ -65,7 +63,7 @@ module.exports = {
 
             done(null, verifiedUser)
         } catch (error) {
-            return done(error)
+            done(error)
         }
     },
     profile: async(id, all, done) => {

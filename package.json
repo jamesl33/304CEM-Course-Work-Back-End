@@ -28,6 +28,7 @@
     },
     "devDependencies": {
         "eslint": "^5.9.0",
+        "jest": "^23.6.0",
         "jsdoc": "^3.5.5",
         "nodemon": "^1.18.7"
     }
