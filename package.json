@@ -6,7 +6,8 @@
     "scripts": {
         "dev": "nodemon index.js",
         "lint": "for _file in $(find . -type f -not -path './node_modules*' -name '*.js' -o -name '*.jsx'); do ./node_modules/.bin/eslint $_file; done",
-        "start": "node index.js || nodejs index.js || echo 'You must install Nodejs'"
+        "start": "node index.js || nodejs index.js || echo 'You must install Nodejs'",
+        "test": "./node_modules/.bin/jest"
     },
     "repository": {
         "type": "git",
