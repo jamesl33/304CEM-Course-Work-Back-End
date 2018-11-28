@@ -120,13 +120,13 @@ module.exports = {
                         if (dbRecipe[key] != recipe[key]) {
                             // Do this in a more verbose way to avoid possible SQL injection attacks
                             if (key === 'title') {
-                                db.prepare(`update recipes set title = ? where id = ?`).run(recipe[key], recipe.id)
+                                db.prepare('update recipes set title = ? where id = ?').run(recipe[key], recipe.id)
                             } else if (key === 'description') {
-                                db.prepare(`update recipes set description = ? where id = ?`).run(recipe[key], recipe.id)
+                                db.prepare('update recipes set description = ? where id = ?').run(recipe[key], recipe.id)
                             } else if (key === 'ingredients') {
-                                db.prepare(`update recipes set ingredients = ? where id = ?`).run(recipe[key], recipe.id)
+                                db.prepare('update recipes set ingredients = ? where id = ?').run(recipe[key], recipe.id)
                             } else if (key === 'image') {
-                                db.prepare(`update recipes set image = ? where id = ?`).run(recipe[key], recipe.id)
+                                db.prepare('update recipes set image = ? where id = ?').run(recipe[key], recipe.id)
                             }
                         }
                     }
@@ -144,7 +144,7 @@ module.exports = {
     },
     togglePublished: async(user, id, done) => {
         try {
-            await new Promise((resolve) => {
+            await new Promise((resolve, reject) => {
                 const db = new sqlite(config.database.name)
                 const dbUser = db.prepare('select * from users where name = ?').get(user.name)
                 const dbRecipe = db.prepare('select * from recipes where id = ?').get(id)
@@ -174,8 +174,6 @@ module.exports = {
                 const comments = db.prepare('select * from comments where recipeId = ?').all(id)
 
                 comments.map(comment => {
-                    // This will be removed when stringifying
-                    comment.id = undefined
                     // This could propably be done in the sql statement; I just don't know how
                     comment.createdBy = db.prepare('select name from users where id = ?').get(comment.createdBy).name
                 })
@@ -212,7 +210,7 @@ module.exports = {
     },
     recent: async(done) => {
         try {
-            const recipes = await new Promise((resolve, reject) => {
+            const recipes = await new Promise((resolve) => {
                 const db = new sqlite(config.database.name)
                 const dbRecipes = db.prepare('select * from recipes where published = 1 order by createdOn desc limit 5').all()
 
@@ -239,7 +237,7 @@ module.exports = {
     },
     top: async(done) => {
         try {
-            const recipes = await new Promise((resolve, reject) => {
+            const recipes = await new Promise((resolve) => {
                 const db = new sqlite(config.database.name)
                 const dbRecipes = db.prepare('select * from recipes where published = 1 order by likeRating desc limit 5').all()
 
@@ -269,7 +267,6 @@ module.exports = {
             await new Promise((resolve) => {
                 const db = new sqlite(config.database.name)
                 const dbUser = db.prepare('select * from users where name = ?').get(user.name)
-                const dbRecipe = db.prepare('select * from recipes where id = ?').get(id)
 
                 db.prepare('update recipes set likeRating = likeRating + 1 where id = ?').run(id)
                 db.prepare('update users set likedRecipes = ? where id = ?').run(JSON.stringify(JSON.parse(dbUser.likedRecipes).concat([id])), dbUser.id)
@@ -289,7 +286,6 @@ module.exports = {
             await new Promise((resolve) => {
                 const db = new sqlite(config.database.name)
                 const dbUser = db.prepare('select * from users where name = ?').get(user.name)
-                const dbRecipe = db.prepare('select * from recipes where id = ?').get(id)
 
                 db.prepare('update recipes set likeRating = likeRating - 1 where id = ?').run(id)
 
@@ -316,7 +312,6 @@ module.exports = {
         try {
             await new Promise((resolve) => {
                 const db = new sqlite(config.database.name)
-                const dbRecipe = db.prepare('select * from recipes where id = ?').get(id)
 
                 db.prepare('update recipes set reported = 1 where id = ?').run(id)
 
@@ -332,7 +327,7 @@ module.exports = {
     },
     search: async(query, done) => {
         try {
-            const results = await new Promise((resolve, reject) => {
+            const results = await new Promise((resolve) => {
                 const db = new sqlite(config.database.name)
                 const titleResults = db.prepare('select * from recipes where title like ?').all(query)
                 const descriptionResults = db.prepare('select * from recipes where description like ?').all(query)
@@ -340,11 +335,69 @@ module.exports = {
 
                 db.close()
 
-                resolve([].concat(titleResults, descriptionResults, ingredientsResults))
+                // Remove any duplicates from the search results
+                let recipes = [].concat(titleResults, descriptionResults, ingredientsResults)
+                let uniqueRecipes = []
+
+                recipes.forEach(recipe => {
+                    if (!(recipe in uniqueRecipes)) {
+                        uniqueRecipes.push(recipe)
+                    }
+                })
+
+                resolve(recipes)
             })
 
             done(null, results)
-        } catch (err) {
+        } catch (error) {
+            done(error)
+        }
+    },
+    user: async(id, done) => {
+        try {
+            const recipes = await new Promise((resolve) => {
+                const db = new sqlite(config.database.name)
+                const recipes = db.prepare('select * from recipes where createdBy = ? order by createdOn limit 5').all(id)
+
+                db.close()
+
+                resolve(recipes)
+            })
+
+            done(null, recipes)
+        } catch (error) {
+            done(error)
+        }
+    },
+    liked: async(id, done) => {
+        try {
+            const recipes = await new Promise((resolve) => {
+                const db = new sqlite(config.database.name)
+                const likedRecipes = db.prepare('select likedRecipes from users where id = ?').get(id)
+
+                let recipeList = []
+
+                if (likedRecipes.likedRecipes) {
+                    let recipes = JSON.parse(likedRecipes.likedRecipes)
+                    recipes = recipes.sort(() => .5 - Math.random()) // Shuffle the liked list
+                    recipes = recipes.slice(0, 5) // Get the first five recipe id's
+
+                    recipes.forEach(recipeId => {
+                        let recipe = db.prepare('select * from recipes where id = ? and published = 1').get(recipeId)
+
+                        if (recipe) {
+                            recipeList.push(recipe)
+                        }
+                    })
+                }
+
+                db.close()
+
+                resolve(recipeList)
+            })
+
+            done(null, recipes)
+        } catch (error) {
             done(error)
         }
     }

@@ -248,4 +248,40 @@ router.post('/search', (req, res) => {
     })
 })
 
+router.post('/user', (req, res) => {
+    passport.authenticate('jwt', (err, user) => {
+        if (err || user === false) {
+            res.status(401).send({
+                message: err ? err.message : 'Unauthorized'
+            })
+        } else {
+            database.recipe.user(req.body.id, (err, recipes) => {
+                if (err) {
+                    console.log(err)
+                } else {
+                    res.send(recipes)
+                }
+            })
+        }
+    })(req, res)
+})
+
+router.post('/liked', (req, res) => {
+    passport.authenticate('jwt', (err, user) => {
+        if (err || user === false) {
+            res.status(401).send({
+                message: err ? err.message : 'Unauthorized'
+            })
+        } else {
+            database.recipe.liked(req.body.id, (err, recipes) => {
+                if (err) {
+                    console.log(err)
+                } else {
+                    res.send(recipes)
+                }
+            })
+        }
+    })(req, res)
+})
+
 module.exports = router

@@ -27,7 +27,8 @@ module.exports = {
                     db.close()
 
                     resolve({
-                        name: user.name,
+                        id: previousId.previousId !== null ? previousId.previousId + 1 : 0,
+                        name: user.name
                     })
                 }
             })
@@ -54,6 +55,7 @@ module.exports = {
 
                 if (bcrypt.compareSync(user.password, dbUser.passwordHash)) {
                     resolve({
+                        id: dbUser.id,
                         name: dbUser.name
                     })
                 } else {
