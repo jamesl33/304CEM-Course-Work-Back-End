@@ -17,18 +17,4 @@ router.post('/comment', (req, res) => {
     })(req, res)
 })
 
-router.post('/reply', (req, res) => {
-    passport.authenticate('jwt', (err, user) => {
-        if (err || user === false) {
-            res.status(401).send({
-                // The user isn't logged in therefore can't reply to a comment
-                message: err ? err.message : 'Unauthorized'
-            })
-        } else {
-            // TODO - Implement this
-            res.status(200).send()
-        }
-    })(req, res)
-})
-
 module.exports = router

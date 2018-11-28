@@ -27,8 +27,5 @@ module.exports = {
         } catch (error) {
             console.log(error) // We shouldn't need to send this to the user. Hense no callback.
         }
-    },
-    reply: async(user, comment, done) => {
-        // TODO - Implement this
     }
 }
