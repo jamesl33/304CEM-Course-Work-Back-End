@@ -11,8 +11,14 @@ module.exports = Object.assign({}, {
     user: user,
     recipe: recipe,
     comments: comments,
-    createDatabase: () => {
-        const db = new sqlite(config.database.name)
+    createDatabase: (databaseName) => {
+        let db = null
+
+        if (databaseName) {
+            db = new sqlite(databaseName)
+        } else {
+            db = new sqlite(config.database.name)
+        }
 
         // I do understand that this database could be normalised which would be a great improvement, however,
         // it does state in the mark scheme that the database will not be marked so I don't see the need right now.
