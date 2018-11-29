@@ -58,3 +58,25 @@ test('Register name already taken', done => {
 
     database.user.add({ username: 'James', name: 'James', email: 'james@example-email.com', password: 'happy man' }, callback)
 })
+
+test('Access a user profile', done => {
+    function callback(err, user) {
+        expect(err).toBe(null)
+        expect(user.name).toEqual('James')
+        expect(user.recipes.length).toEqual(1) // We don't need to test the content of the recipes
+        done()
+    }
+
+    database.user.profile(0, false, callback)
+})
+
+test('Access a user profile', done => {
+    function callback(err, user) {
+        expect(err).toBe(null)
+        expect(user.name).toEqual('James')
+        expect(user.recipes.length).toEqual(2) // We don't need to test the content of the recipes
+        done()
+    }
+
+    database.user.profile(0, true, callback)
+})
