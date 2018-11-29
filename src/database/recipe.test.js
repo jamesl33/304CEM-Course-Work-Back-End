@@ -150,8 +150,7 @@ test('Attempt to load a recipe that does not exist', done => {
 })
 
 test('Fetch the recent recipes', done => {
-    database.recipe.recent((err, recipes) => {
-        expect(err).toBe(null)
+    database.recipe.recent((recipes) => {
         expect(recipes).toEqual([
             {
                 id: 3,
@@ -184,8 +183,7 @@ test('Fetch the recent recipes', done => {
 })
 
 test('Fetch the top recipes', done => {
-    database.recipe.top((err, recipes) => {
-        expect(err).toBe(null)
+    database.recipe.top((recipes) => {
         expect(recipes).toEqual([
             {
                 id: 0,
@@ -218,8 +216,7 @@ test('Fetch the top recipes', done => {
 })
 
 test('Test searching for a recipe', done => {
-    database.recipe.search('Shortbread', (err, recipes) => {
-        expect(err).toBe(null)
+    database.recipe.search('Shortbread', (recipes) => {
         expect(recipes).toEqual([
             {
                 id: 0,
