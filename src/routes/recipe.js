@@ -210,7 +210,6 @@ router.post('/load', (req, res) => {
  * @route {POST} /recent
  */
 router.post('/recent', (req, res) => {
-    console.log(req.body)
     // Since this is for the home page we don't need to authenticate
     database.recipe.recent((recipes) => {
         res.send(recipes)
