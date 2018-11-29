@@ -153,22 +153,30 @@ test('Fetch the recent recipes', done => {
     database.recipe.recent((err, recipes) => {
         expect(err).toBe(null)
         expect(recipes).toEqual([
-            { id: 3,
-              title: 'Apple Crumble',
-              image: 'public/images/uploads/12cd2734b476c7005769bb3b5676ae9d',
-              description: 'Crumbly and tasty' },
-            { id: 2,
-              title: 'Spaghetti Bolognese',
-              image: 'public/images/uploads/d8efdbc79ca1b5d91b398f1dc247a9a7',
-              description: 'Messy to eat; takes great' },
-            { id: 1,
-              title: 'Lasagna',
-              image: 'public/images/uploads/65fa7d7199e93aa38f3bb009836a8a9e',
-              description: 'Great tasting lasagna' },
-            { id: 0,
-              title: 'Shortbread',
-              image: 'public/images/uploads/35138f1d2693144aa14e1dd9040b9f7b',
-              description: 'Crispy shortbread' }
+            {
+                id: 3,
+                title: 'Apple Crumble',
+                image: 'public/images/uploads/12cd2734b476c7005769bb3b5676ae9d',
+                description: 'Crumbly and tasty'
+            },
+            {
+                id: 2,
+                title: 'Spaghetti Bolognese',
+                image: 'public/images/uploads/d8efdbc79ca1b5d91b398f1dc247a9a7',
+                description: 'Messy to eat; takes great'
+            },
+            {
+                id: 1,
+                title: 'Lasagna',
+                image: 'public/images/uploads/65fa7d7199e93aa38f3bb009836a8a9e',
+                description: 'Great tasting lasagna'
+            },
+            {
+                id: 0,
+                title: 'Shortbread',
+                image: 'public/images/uploads/35138f1d2693144aa14e1dd9040b9f7b',
+                description: 'Crispy shortbread'
+            }
         ])
 
         done()
@@ -179,22 +187,30 @@ test('Fetch the top recipes', done => {
     database.recipe.top((err, recipes) => {
         expect(err).toBe(null)
         expect(recipes).toEqual([
-            { id: 0,
-              title: 'Shortbread',
-              image: 'public/images/uploads/35138f1d2693144aa14e1dd9040b9f7b',
-              description: 'Crispy shortbread' },
-            { id: 1,
-              title: 'Lasagna',
-              image: 'public/images/uploads/65fa7d7199e93aa38f3bb009836a8a9e',
-              description: 'Great tasting lasagna' },
-            { id: 2,
-              title: 'Spaghetti Bolognese',
-              image: 'public/images/uploads/d8efdbc79ca1b5d91b398f1dc247a9a7',
-              description: 'Messy to eat; takes great' },
-            { id: 3,
-              title: 'Apple Crumble',
-              image: 'public/images/uploads/12cd2734b476c7005769bb3b5676ae9d',
-              description: 'Crumbly and tasty' }
+            {
+                id: 0,
+                title: 'Shortbread',
+                image: 'public/images/uploads/35138f1d2693144aa14e1dd9040b9f7b',
+                description: 'Crispy shortbread'
+            },
+            {
+                id: 1,
+                title: 'Lasagna',
+                image: 'public/images/uploads/65fa7d7199e93aa38f3bb009836a8a9e',
+                description: 'Great tasting lasagna'
+            },
+            {
+                id: 2,
+                title: 'Spaghetti Bolognese',
+                image: 'public/images/uploads/d8efdbc79ca1b5d91b398f1dc247a9a7',
+                description: 'Messy to eat; takes great'
+            },
+            {
+                id: 3,
+                title: 'Apple Crumble',
+                image: 'public/images/uploads/12cd2734b476c7005769bb3b5676ae9d',
+                description: 'Crumbly and tasty'
+            }
         ])
 
         done()
@@ -205,14 +221,18 @@ test('Test searching for a recipe', done => {
     database.recipe.search('Shortbread', (err, recipes) => {
         expect(err).toBe(null)
         expect(recipes).toEqual([
-            { id: 0,
-              title: 'Shortbread',
-              image: 'public/images/uploads/35138f1d2693144aa14e1dd9040b9f7b',
-              description: 'Crispy shortbread'},
-            { id: 4,
-              title: 'Shortbread',
-              image: 'public/images/uploads/7c0e650a998d91eaebcf2ea9f85f7242',
-              description: 'Crispy shortbread'}
+            {
+                id: 0,
+                title: 'Shortbread',
+                image: 'public/images/uploads/35138f1d2693144aa14e1dd9040b9f7b',
+                description: 'Crispy shortbread'
+            },
+            {
+                id: 4,
+                title: 'Shortbread',
+                image: 'public/images/uploads/7c0e650a998d91eaebcf2ea9f85f7242',
+                description: 'Crispy shortbread'
+            }
         ])
 
         done()
@@ -243,7 +263,7 @@ test('Test reporting a recipe', done => {
 
     const newState = db.prepare('select * from recipes where id = 0').get()
 
-    expect(Boolean(originalState.reported)).toEqual(!Boolean(newState.reported))
+    expect(Boolean(originalState.reported)).toEqual(!newState.reported)
 
     db.prepare('update recipes set reported = ? where id = 0').run(originalState.reported)
 
@@ -262,7 +282,7 @@ test('Test liking a recipe', done => {
     const newUserState = db.prepare('select * from users where id = 3').get()
     const newRecipeState = db.prepare('select * from recipes where id = 0').get()
 
-    expect(newUserState.likedRecipes).toEqual(JSON.stringify(JSON.parse(originalUserState.likedRecipes).concat(["0"])))
+    expect(newUserState.likedRecipes).toEqual(JSON.stringify(JSON.parse(originalUserState.likedRecipes).concat(['0'])))
     expect(newRecipeState.likeRating).toEqual(originalRecipeState.likeRating + 1)
 
     db.prepare('update users set likedRecipes = ? where id = 3').run(originalUserState.likedRecipes)
@@ -307,7 +327,7 @@ test('Test toggling the published state of a recipe that the user owns', done =>
 
     const newState = db.prepare('select * from recipes where id = 0').get()
 
-    expect(Boolean(originalState.published)).toEqual(!Boolean(newState.published))
+    expect(Boolean(originalState.published)).toEqual(!newState.published)
 
     db.prepare('update recipes set published = ? where id = 0').run(originalState.published)
 
