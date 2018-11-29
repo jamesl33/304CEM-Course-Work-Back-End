@@ -8,7 +8,7 @@
         "lint": "for _file in $(find . -type f -name '*.js' -o -name '*.jsx' | grep -vE './node_modules|./docs'); do ./node_modules/.bin/eslint $_file; done",
         "start": "node index.js || nodejs index.js || echo 'You must install Nodejs'",
         "test": "./node_modules/.bin/jest",
-        "document": "./node_modules/.bin/jsdoc --destination docs $(find . -type f -name '*.js' -o -name '*.jsx' | grep -vE './node_modules|./docs')"
+        "document": "./node_modules/.bin/jsdoc --configure jsdoc.json --destination docs"
     },
     "repository": {
         "type": "git",
