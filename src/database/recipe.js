@@ -253,68 +253,50 @@ module.exports = {
             done(error)
         }
     },
-    like: async(user, id, done) => {
-        try {
-            await new Promise((resolve) => {
-                const db = new sqlite(config.database.name)
-                const dbUser = db.prepare('select * from users where name = ?').get(user.name)
+    like: async(user, id) => {
+        await new Promise((resolve) => {
+            const db = new sqlite(config.database.name)
+            const dbUser = db.prepare('select * from users where name = ?').get(user.name)
 
-                db.prepare('update recipes set likeRating = likeRating + 1 where id = ?').run(id)
-                db.prepare('update users set likedRecipes = ? where id = ?').run(JSON.stringify(JSON.parse(dbUser.likedRecipes).concat([id])), dbUser.id)
+            db.prepare('update recipes set likeRating = likeRating + 1 where id = ?').run(id)
+            db.prepare('update users set likedRecipes = ? where id = ?').run(JSON.stringify(JSON.parse(dbUser.likedRecipes).concat([`${id}`])), dbUser.id)
 
-                db.close()
+            db.close()
 
-                resolve()
-            })
-
-            done(null)
-        } catch (error) {
-            done(error)
-        }
+            resolve()
+        })
     },
-    unlike: async(user, id, done) => {
-        try {
-            await new Promise((resolve) => {
-                const db = new sqlite(config.database.name)
-                const dbUser = db.prepare('select * from users where name = ?').get(user.name)
+    unlike: async(user, id) => {
+        await new Promise((resolve) => {
+            const db = new sqlite(config.database.name)
+            const dbUser = db.prepare('select * from users where name = ?').get(user.name)
 
-                db.prepare('update recipes set likeRating = likeRating - 1 where id = ?').run(id)
+            db.prepare('update recipes set likeRating = likeRating - 1 where id = ?').run(id)
 
-                let newLikedRecipes = JSON.parse(dbUser.likedRecipes)
-                const index = newLikedRecipes.indexOf(`${id}`)
+            let newLikedRecipes = JSON.parse(dbUser.likedRecipes)
+            const index = newLikedRecipes.indexOf(`${id}`)
 
-                if (index !== -1) {
-                    newLikedRecipes.splice(index, 1)
-                }
+            if (index !== -1) {
+                newLikedRecipes.splice(index, 1)
+            }
 
-                db.prepare('update users set likedRecipes = ? where id = ?').run(JSON.stringify(newLikedRecipes), dbUser.id)
+            db.prepare('update users set likedRecipes = ? where id = ?').run(JSON.stringify(newLikedRecipes), dbUser.id)
 
-                db.close()
+            db.close()
 
-                resolve()
-            })
-
-            done(null)
-        } catch (error) {
-            done(error)
-        }
+            resolve()
+        })
     },
-    report: async(user, id, done) => {
-        try {
-            await new Promise((resolve) => {
-                const db = new sqlite(config.database.name)
+    report: async(id) => {
+        await new Promise((resolve) => {
+            const db = new sqlite(config.database.name)
 
-                db.prepare('update recipes set reported = 1 where id = ?').run(id)
+            db.prepare('update recipes set reported = 1 where id = ?').run(id)
 
-                db.close()
+            db.close()
 
-                resolve()
-            })
-
-            done(null)
-        } catch (error) {
-            done(error)
-        }
+            resolve()
+        })
     },
     search: async(query, done) => {
         try {

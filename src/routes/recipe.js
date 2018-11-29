@@ -179,17 +179,10 @@ router.post('/like', (req, res) => {
                 message: err ? err.message : 'Unauthorized'
             })
         } else {
-            database.recipe.like(user, req.body.id, (err) => {
-                if (err) {
-                    // The user doesn't have access to this recipe or it doesn't exist
-                    res.status(403).send({
-                        message: err.message
-                    })
-                } else {
-                    // Notify the user that the resource was updated successfully
-                    res.status(201).send()
-                }
-            })
+            database.recipe.like(user, req.body.id)
+
+            // Notify the user that the resource was updated successfully
+            res.status(201).send()
         }
     })(req, res)
 })
@@ -201,17 +194,10 @@ router.post('/unlike', (req, res) => {
                 message: err ? err.message : 'Unauthorized'
             })
         } else {
-            database.recipe.unlike(user, req.body.id, (err) => {
-                if (err) {
-                    // The user doesn't have access to this recipe or it doesn't exist
-                    res.status(403).send({
-                        message: err.message
-                    })
-                } else {
-                    // Notify the user that the resource was updated successfully
-                    res.status(201).send()
-                }
-            })
+            database.recipe.unlike(user, req.body.id)
+
+            // Notify the user that the resource was updated successfully
+            res.status(201).send()
         }
     })(req, res)
 })
@@ -223,17 +209,10 @@ router.post('/report', (req, res) => {
                 message: err ? err.message : 'Unauthorized'
             })
         } else {
-            database.recipe.report(user, req.body.id, (err) => {
-                if (err) {
-                    // The user doesn't have access to this recipe or it doesn't exist
-                    res.status(403).send({
-                        message: err.message
-                    })
-                } else {
-                    // Notify the user that the resource was updated successfully
-                    res.status(201).send()
-                }
-            })
+            database.recipe.report(req.body.id)
+
+            // Notify the user that the resource was updated successfully
+            res.status(201).send()
         }
     })(req, res)
 })

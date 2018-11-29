@@ -218,3 +218,75 @@ test('Test searching for a recipe', done => {
         done()
     })
 })
+
+test('Ensure that we can get the users recipes', done => {
+    database.recipe.user(0, (err, recipes) => {
+        expect(err).toBe(null)
+        expect(recipes)
+        done()
+    })
+})
+
+test('Ensure that we can get the users liked recipes', done => {
+    database.recipe.liked(0, (err, recipes) => {
+        expect(err).toBe(null)
+        expect(recipes)
+        done()
+    })
+})
+
+test('Test reporting a recipe', done => {
+    const db = new sqlite(config.database.name)
+    const originalState = db.prepare('select * from recipes where id = 0').get()
+
+    database.recipe.report(0)
+
+    const newState = db.prepare('select * from recipes where id = 0').get()
+
+    expect(Boolean(originalState.reported)).toEqual(!Boolean(newState.reported))
+
+    db.prepare('update recipes set reported = ? where id = 0').run(originalState.reported)
+
+    done()
+})
+
+test('Test liking a recipe', done => {
+    const db = new sqlite(config.database.name)
+    const originalUserState = db.prepare('select * from users where id = 3').get()
+    const originalRecipeState = db.prepare('select * from recipes where id = 0').get()
+
+    database.recipe.like({ id: 3, name: 'Martha' }, 0)
+
+    const newUserState = db.prepare('select * from users where id = 3').get()
+    const newRecipeState = db.prepare('select * from recipes where id = 0').get()
+
+    expect(newUserState.likedRecipes).toEqual(JSON.stringify(JSON.parse(originalUserState.likedRecipes).concat(["0"])))
+    expect(newRecipeState.likeRating).toEqual(originalRecipeState.likeRating + 1)
+
+    db.prepare('update users set likedRecipes = ? where id = 3').run(originalUserState.likedRecipes)
+    db.prepare('update recipes set likeRating = ? where id = 0').run(originalRecipeState.likeRating)
+
+    done()
+})
+
+test('Test unliking a recipe', done => {
+    const db = new sqlite(config.database.name)
+    const originalUserState = db.prepare('select * from users where id = 2').get()
+    const originalRecipeState = db.prepare('select * from recipes where id = 0').get()
+
+    database.recipe.unlike({ id: 2, name: 'Jess' }, 0)
+
+    const newUserState = db.prepare('select * from users where id = 2').get()
+    const newRecipeState = db.prepare('select * from recipes where id = 0').get()
+
+    let newLikedRecipes = JSON.parse(originalUserState.likedRecipes)
+    newLikedRecipes.splice(newLikedRecipes.indexOf(`${0}`), 1)
+
+    expect(newUserState.likedRecipes).toEqual(JSON.stringify(newLikedRecipes))
+    expect(newRecipeState.likeRating).toEqual(originalRecipeState.likeRating - 1)
+
+    db.prepare('update users set likedRecipes = ? where id = 2').run(originalUserState.likedRecipes)
+    db.prepare('update recipes set likeRating = ? where id = 0').run(originalRecipeState.likeRating)
+
+    done()
+})
