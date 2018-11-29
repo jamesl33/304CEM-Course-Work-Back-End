@@ -53,7 +53,7 @@ module.exports = {
                     return reject(new Error('Could not find user'))
                 }
 
-                if (dbRecipe.id !== dbUser.id) {
+                if (dbRecipe.createdBy !== dbUser.id) {
                     return reject(new Error('You don not have permission to edit this recipe'))
                 }
 
@@ -190,6 +190,7 @@ module.exports = {
 
                 resolve({
                     id: dbRecipe.id,
+                    createdBy: dbRecipe.createdBy,
                     title: dbRecipe.title,
                     image: dbRecipe.image,
                     ingredients: dbRecipe.ingredients,
