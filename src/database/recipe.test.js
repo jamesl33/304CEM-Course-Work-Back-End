@@ -247,6 +247,8 @@ test('Test reporting a recipe', done => {
 
     db.prepare('update recipes set reported = ? where id = 0').run(originalState.reported)
 
+    db.close()
+
     done()
 })
 
@@ -265,6 +267,8 @@ test('Test liking a recipe', done => {
 
     db.prepare('update users set likedRecipes = ? where id = 3').run(originalUserState.likedRecipes)
     db.prepare('update recipes set likeRating = ? where id = 0').run(originalRecipeState.likeRating)
+
+    db.close()
 
     done()
 })
@@ -288,5 +292,33 @@ test('Test unliking a recipe', done => {
     db.prepare('update users set likedRecipes = ? where id = 2').run(originalUserState.likedRecipes)
     db.prepare('update recipes set likeRating = ? where id = 0').run(originalRecipeState.likeRating)
 
+    db.close()
+
     done()
+})
+
+test('Test toggling the published state of a recipe that the user owns', done => {
+    const db = new sqlite(config.database.name)
+    const originalState = db.prepare('select * from recipes where id = 0').get()
+
+    database.recipe.togglePublished({ id: 3, name: 'Martha' }, 0, (err) => {
+        expect(err).toBe(null)
+    })
+
+    const newState = db.prepare('select * from recipes where id = 0').get()
+
+    expect(Boolean(originalState.published)).toEqual(!Boolean(newState.published))
+
+    db.prepare('update recipes set published = ? where id = 0').run(originalState.published)
+
+    db.close()
+
+    done()
+})
+
+test('Test toggling the published state of a recipe that the user does not own', done => {
+    database.recipe.togglePublished({ id: 0, name: 'James' }, 0, (err) => {
+        expect(err.message).toEqual('You do not own this recipe')
+        done()
+    })
 })
