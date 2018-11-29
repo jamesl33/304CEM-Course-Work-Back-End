@@ -31,6 +31,7 @@
         "eslint": "^5.9.0",
         "jest": "^23.6.0",
         "jsdoc": "^3.5.5",
+        "jsdoc-route-plugin": "^0.1.0",
         "nodemon": "^1.18.7"
     }
 }
