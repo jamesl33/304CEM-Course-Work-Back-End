@@ -357,11 +357,16 @@ module.exports = {
         try {
             const recipes = await new Promise((resolve) => {
                 const db = new sqlite(config.database.name)
-                const recipes = db.prepare('select * from recipes where createdBy = ? order by createdOn limit 5').all(id)
+                let dbRecipes = db.prepare('select * from recipes where createdBy = ?').all(id)
+
+                if (dbRecipes) {
+                    dbRecipes = dbRecipes.sort(() => .5 - Math.random()) // Shuffle the users recipes
+                    dbRecipes = dbRecipes.slice(0, 5) // Show the user 5 random recipes which they created
+                }
 
                 db.close()
 
-                resolve(recipes)
+                resolve(dbRecipes)
             })
 
             done(null, recipes)

@@ -67,5 +67,29 @@ module.exports = {
         } catch (error) {
             return done(error)
         }
+    },
+    profile: async(id, all, done) => {
+        try {
+            const profile = await new Promise((resolve, reject) => {
+                const db = new sqlite(config.database.name)
+                const dbUser = db.prepare('select name from users where id = ?').get(id)
+                let dbRecipes = []
+
+                if (all) {
+                    dbRecipes = db.prepare('select * from recipes where createdBy = ? order by createdOn').all(id)
+                } else {
+                    dbRecipes = db.prepare('select * from recipes where createdBy = ? and published = 1 order by createdOn').all(id)
+                }
+
+                resolve({
+                    name: dbUser.name,
+                    recipes: dbRecipes
+                })
+            })
+
+            done(null, profile)
+        } catch (error) {
+            done(error)
+        }
     }
 }

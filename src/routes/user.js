@@ -38,4 +38,26 @@ router.post('/register', (req, res) => {
     }
 })
 
+router.post('/profile', (req, res) => {
+    passport.authenticate('jwt', (err, user) => {
+        if (err || user === false) {
+            database.user.profile(req.body.id, false, (err, profile) => {
+                if (err) {
+                    console.log(err)
+                } else {
+                    res.send(profile)
+                }
+            })
+        } else {
+            database.user.profile(req.body.id, true, (err, profile) => {
+                if (err) {
+                    console.log(err)
+                } else {
+                    res.send(profile)
+                }
+            })
+        }
+    })(req, res)
+})
+
 module.exports = router
