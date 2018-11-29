@@ -1,43 +1,54 @@
+/**
+ * @module database:recipe
+ */
+
 'use strict'
 
 const sqlite = require('better-sqlite3')
 const config = require('../config.json')
 
 async function _save(user, recipe, publish) {
-    try {
-        await new Promise((resolve) => {
-            const db = new sqlite(config.database.name)
-            const previousId = db.prepare('select max(id) as previousId from recipes').get()
-            const dbUser = db.prepare('select * from users where name = ?').get(user.name)
+    await new Promise((resolve) => {
+        const db = new sqlite(config.database.name)
+        const previousId = db.prepare('select max(id) as previousId from recipes').get()
+        const dbUser = db.prepare('select * from users where name = ?').get(user.name)
 
-            db.prepare('insert into recipes values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').run(
-                previousId.previousId !== null ? previousId.previousId + 1 : 0,
-                dbUser.id,
-                Math.floor(new Date() / 1000),
-                recipe.title,
-                recipe.image,
-                recipe.ingredients,
-                recipe.description,
-                JSON.stringify(recipe.steps),
-                publish ? 1 : 0,
-                0, // likeRating
-                0, // reported
-                0 // viewCount
-            )
+        db.prepare('insert into recipes values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').run(
+            previousId.previousId !== null ? previousId.previousId + 1 : 0,
+            dbUser.id,
+            Math.floor(new Date() / 1000),
+            recipe.title,
+            recipe.image,
+            recipe.ingredients,
+            recipe.description,
+            JSON.stringify(recipe.steps),
+            publish ? 1 : 0,
+            0, // likeRating
+            0, // reported
+            0 // viewCount
+        )
 
-            db.close()
+        db.close()
 
-            resolve()
-        })
-    } catch (error) {
-        console.log(error) // We shouldn't need to send this to the user. Hense no callback.
-    }
+        resolve()
+    })
 }
 
 module.exports = {
+    /**
+     * @description Save a recipe to the database without publishing it
+     * @param {Object} user - The user that is saving the recipe; should be obtained from passport
+     * @param {Object} recipe - The recipe which is being saved
+     */
     save: (user, recipe) => {
         return _save(user, recipe, false)
     },
+    /**
+     * @description Load the recipe from the database in a state that can be put into a redux-form
+     * @param {Object} user - The user that is loading the recipe; should be obtained from passport
+     * @param {Integer} id - The id of the recipe to load
+     * @param {Function} done - Callback funtion whose arguments are (error, recipe)
+     */
     edit: async(user, id, done) => {
         try {
             const recipe = await new Promise((resolve, reject) => {
@@ -74,9 +85,20 @@ module.exports = {
             return done(error)
         }
     },
+    /**
+     * @description Save a recipe to the database in the published state; it's viewable to the general public
+     * @param {Object} user - The user that is posting the recipe; should be obtained from passport
+     * @param {Object} recipe - The recipe the user is publishing
+     */
     publish: (user, recipe) => {
         return _save(user, recipe, true)
     },
+    /**
+     * @description Take the users altered recipe and update it in the database
+     * @param {Object} user - The user who is updating the recipe; should be obtained from passport
+     * @param {Object} recipe - The recipe which is being updated
+     * @param {Function} done - A callback with the single argument (error)
+     */
     update: async(user, recipe, done) => {
         function newSteps(originalSteps, newSteps) {
             for (let i = 0; i < newSteps.length; i++) {
@@ -132,6 +154,12 @@ module.exports = {
             done(error)
         }
     },
+    /**
+     * @description Toggle the published state of a recipe
+     * @param {Object} user - The user who is toggling the recipe state
+     * @param {Integer} id - The id of the recipe which is being updated
+     * @param {Function} done - A callback with the single argument (err)
+     */
     togglePublished: async(user, id, done) => {
         try {
             await new Promise((resolve, reject) => {
@@ -155,6 +183,12 @@ module.exports = {
             done(error)
         }
     },
+    /**
+     * @description Load a recipe object from the database
+     * @param {Object} user - The user who is making the request; should be obtained from passport
+     * @param {Integer} id - The id of the recipe the user if loading
+     * @param {Function} done - A callback with the arguments (error, recipe)
+     */
     load: async(user, id, done) => {
         try {
             const recipe = await new Promise((resolve, reject) => {
@@ -199,60 +233,65 @@ module.exports = {
             done(error)
         }
     },
+    /**
+     * @description Get 5 of the most recent recipes from the database
+     * @param {Function} done - A callback with the single argument (recipes)
+     */
     recent: async(done) => {
-        try {
-            const recipes = await new Promise((resolve) => {
-                const db = new sqlite(config.database.name)
-                const dbRecipes = db.prepare('select * from recipes where published = 1 order by createdOn desc limit 5').all()
+        const recipes = await new Promise((resolve) => {
+            const db = new sqlite(config.database.name)
+            const dbRecipes = db.prepare('select * from recipes where published = 1 order by createdOn desc limit 5').all()
 
-                const recipes = []
+            const recipes = []
 
-                dbRecipes.forEach(recipe => {
-                    recipes.push({
-                        id: recipe.id,
-                        title: recipe.title,
-                        image: recipe.image,
-                        description: recipe.description
-                    })
+            dbRecipes.forEach(recipe => {
+                recipes.push({
+                    id: recipe.id,
+                    title: recipe.title,
+                    image: recipe.image,
+                    description: recipe.description
                 })
-
-                resolve(recipes)
-
-                db.close()
             })
 
-            done(null, recipes)
-        } catch (error) {
-            done(error)
-        }
+            resolve(recipes)
+
+            db.close()
+        })
+
+        done(recipes)
     },
     top: async(done) => {
-        try {
-            const recipes = await new Promise((resolve) => {
-                const db = new sqlite(config.database.name)
-                const dbRecipes = db.prepare('select * from recipes where published = 1 order by likeRating desc limit 5').all()
+        /**
+         * @description Get the top 5 recipes from the database
+         * @param {Function} done - A callback with the single argument recipes
+         */
+        const recipes = await new Promise((resolve) => {
+            const db = new sqlite(config.database.name)
+            const dbRecipes = db.prepare('select * from recipes where published = 1 order by likeRating desc limit 5').all()
 
-                const recipes = []
+            const recipes = []
 
-                dbRecipes.forEach(recipe => {
-                    recipes.push({
-                        id: recipe.id,
-                        title: recipe.title,
-                        image: recipe.image,
-                        description: recipe.description
-                    })
+            dbRecipes.forEach(recipe => {
+                recipes.push({
+                    id: recipe.id,
+                    title: recipe.title,
+                    image: recipe.image,
+                    description: recipe.description
                 })
-
-                resolve(recipes)
-
-                db.close()
             })
 
-            done(null, recipes)
-        } catch (error) {
-            done(error)
-        }
+            resolve(recipes)
+
+            db.close()
+        })
+
+        done(recipes)
     },
+    /**
+     * @description Have a user like a recipe
+     * @param {Object} user - The user whom is liking the recipe; should be obtained from passport
+     * @param {Integer} id - The id of the recipe that is being liked
+     */
     like: async(user, id) => {
         await new Promise((resolve) => {
             const db = new sqlite(config.database.name)
@@ -266,6 +305,11 @@ module.exports = {
             resolve()
         })
     },
+    /**
+     * @description Have the user unlike; this is the exact opposite operation performed by like
+     * @param {Object} user - The user that is unliking the recipe; should be obtained from passport
+     * @param {Integer} id - The id of the recipe the user is unliking
+     */
     unlike: async(user, id) => {
         await new Promise((resolve) => {
             const db = new sqlite(config.database.name)
@@ -287,6 +331,10 @@ module.exports = {
             resolve()
         })
     },
+    /**
+     * @description Mark a recipe as reported
+     * @param {Integer} id - The id of the recipe which is being reported
+     */
     report: async(id) => {
         await new Promise((resolve) => {
             const db = new sqlite(config.database.name)
@@ -298,90 +346,93 @@ module.exports = {
             resolve()
         })
     },
+    /**
+     * @description Search the database for recipes
+     * @param {String} query - The search query
+     * @param {Function} done - A callback with the single callback (results)
+     */
     search: async(query, done) => {
-        try {
-            const results = await new Promise((resolve) => {
-                const db = new sqlite(config.database.name)
-                const titleResults = db.prepare('select * from recipes where title like ?').all(query)
-                const descriptionResults = db.prepare('select * from recipes where description like ?').all(query)
-                const ingredientsResults = db.prepare('select * from recipes where ingredients like ?').all(query)
+        const results = await new Promise((resolve) => {
+            const db = new sqlite(config.database.name)
+            const titleResults = db.prepare('select * from recipes where title like ?').all(query)
+            const descriptionResults = db.prepare('select * from recipes where description like ?').all(query)
+            const ingredientsResults = db.prepare('select * from recipes where ingredients like ?').all(query)
 
-                db.close()
+            db.close()
 
-                // Remove any duplicates from the search results
-                let recipes = [].concat(titleResults, descriptionResults, ingredientsResults)
-                let uniqueRecipes = []
+            // Remove any duplicates from the search results
+            let recipes = [].concat(titleResults, descriptionResults, ingredientsResults)
+            let uniqueRecipes = []
 
-                recipes.forEach(recipe => {
-                    if (!(recipe in uniqueRecipes)) {
-                        uniqueRecipes.push({
-                            id: recipe.id,
-                            title: recipe.title,
-                            image: recipe.image,
-                            description: recipe.description
-                        })
-                    }
-                })
-
-                resolve(uniqueRecipes)
-            })
-
-            done(null, results)
-        } catch (error) {
-            done(error)
-        }
-    },
-    user: async(id, done) => {
-        try {
-            const recipes = await new Promise((resolve) => {
-                const db = new sqlite(config.database.name)
-                let dbRecipes = db.prepare('select * from recipes where createdBy = ?').all(id)
-
-                if (dbRecipes) {
-                    dbRecipes = dbRecipes.sort(() => .5 - Math.random()) // Shuffle the users recipes
-                    dbRecipes = dbRecipes.slice(0, 5) // Show the user 5 random recipes which they created
-                }
-
-                db.close()
-
-                resolve(dbRecipes)
-            })
-
-            done(null, recipes)
-        } catch (error) {
-            done(error)
-        }
-    },
-    liked: async(id, done) => {
-        try {
-            const recipes = await new Promise((resolve) => {
-                const db = new sqlite(config.database.name)
-                const likedRecipes = db.prepare('select likedRecipes from users where id = ?').get(id)
-
-                let recipeList = []
-
-                if (likedRecipes.likedRecipes) {
-                    let recipes = JSON.parse(likedRecipes.likedRecipes)
-                    recipes = recipes.sort(() => .5 - Math.random()) // Shuffle the liked list
-                    recipes = recipes.slice(0, 5) // Get the first five recipe id's
-
-                    recipes.forEach(recipeId => {
-                        let recipe = db.prepare('select * from recipes where id = ? and published = 1').get(recipeId)
-
-                        if (recipe) {
-                            recipeList.push(recipe)
-                        }
+            recipes.forEach(recipe => {
+                if (!(recipe in uniqueRecipes)) {
+                    uniqueRecipes.push({
+                        id: recipe.id,
+                        title: recipe.title,
+                        image: recipe.image,
+                        description: recipe.description
                     })
                 }
-
-                db.close()
-
-                resolve(recipeList)
             })
 
-            done(null, recipes)
-        } catch (error) {
-            done(error)
-        }
+            resolve(uniqueRecipes)
+        })
+
+        done(results)
+    },
+    /**
+     * @description Load at random 5 of the user recipes
+     * @param {Integer} id - The users id
+     * @param {Function} done - A callback with the single argument (recipes)
+     */
+    user: async(id, done) => {
+        const recipes = await new Promise((resolve) => {
+            const db = new sqlite(config.database.name)
+            let dbRecipes = db.prepare('select * from recipes where createdBy = ?').all(id)
+
+            if (dbRecipes) {
+                dbRecipes = dbRecipes.sort(() => .5 - Math.random()) // Shuffle the users recipes
+                dbRecipes = dbRecipes.slice(0, 5) // Show the user 5 random recipes which they created
+            }
+
+            db.close()
+
+            resolve(dbRecipes)
+        })
+
+        done(null, recipes)
+    },
+    /**
+     * @description Load at random 5 of the users' liked recipes
+     * @param {Integer} id - The id of the user
+     * @param {Function} done - A function with the single argument (recipes)
+     */
+    liked: async(id, done) => {
+        const recipes = await new Promise((resolve) => {
+            const db = new sqlite(config.database.name)
+            const likedRecipes = db.prepare('select likedRecipes from users where id = ?').get(id)
+
+            let recipeList = []
+
+            if (likedRecipes.likedRecipes) {
+                let recipes = JSON.parse(likedRecipes.likedRecipes)
+                recipes = recipes.sort(() => .5 - Math.random()) // Shuffle the liked list
+                recipes = recipes.slice(0, 5) // Get the first five recipe id's
+
+                recipes.forEach(recipeId => {
+                    let recipe = db.prepare('select * from recipes where id = ? and published = 1').get(recipeId)
+
+                    if (recipe) {
+                        recipeList.push(recipe)
+                    }
+                })
+            }
+
+            db.close()
+
+            resolve(recipeList)
+        })
+
+        done(null, recipes)
     }
 }

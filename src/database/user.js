@@ -1,3 +1,7 @@
+/**
+ * @module database:user
+ */
+
 'use strict'
 
 const bcrypt = require('bcrypt')
@@ -5,6 +9,11 @@ const sqlite = require('better-sqlite3')
 const config = require('../config.json')
 
 module.exports = {
+    /**
+     * @description Add a new user to the database
+     * @param {Object} user - The user being added the database
+     * @param {Function} done - A callback with the arguments (error, done)
+     */
     add: async(user, done) => {
         try {
             const newUser = await new Promise((resolve, reject) => {
@@ -38,6 +47,11 @@ module.exports = {
             done(error)
         }
     },
+    /**
+     * @description Verify a user; login
+     * @param {Object} user - The user that is we are verifying
+     * @param {Function} done - A callback with the arguments (error, user)
+     */
     verify: async(user, done) => {
         try {
             const verifiedUser = await new Promise((resolve, reject) => {
@@ -66,6 +80,12 @@ module.exports = {
             done(error)
         }
     },
+    /**
+     * @description Load the users profile from the database
+     * @param {Integer} id - The id of the user whose profile we want
+     * @param {Boolean} all - Whether to load all recipes or just published ones
+     * @param {Function} done - A callback with the single argument (profile)
+     */
     profile: async(id, all, done) => {
         const profile = await new Promise((resolve) => {
             const db = new sqlite(config.database.name)

@@ -1,3 +1,7 @@
+/**
+ * @module database
+ */
+
 'use strict'
 
 const fs = require('fs')
@@ -11,6 +15,11 @@ module.exports = Object.assign({}, {
     user: user,
     recipe: recipe,
     comments: comments,
+
+    /**
+     * @description Create an empty database containing all the required tables for the Recipe Blog
+     * @param {String} databaseName - Optional filename to be used for the database
+     */
     createDatabase: (databaseName) => {
         let db = null
 

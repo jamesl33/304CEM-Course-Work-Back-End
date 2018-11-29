@@ -148,27 +148,15 @@ router.post('/load', (req, res) => {
 
 router.post('/recent', (req, res) => {
     // Since this is for the home page we don't need to authenticate
-    database.recipe.recent((err, recipes) => {
-        if (err) {
-            res.status(403).send({
-                message: err ? err.message : 'Unauthorized'
-            })
-        } else {
-            res.send(recipes)
-        }
+    database.recipe.recent((recipes) => {
+        res.send(recipes)
     })
 })
 
 router.post('/top', (req, res) => {
     // Since this is for the home page we don't need to authenticate
-    database.recipe.top((err, recipes) => {
-        if (err) {
-            res.status(403).send({
-                message: err ? err.message : 'Unauthorized'
-            })
-        } else {
-            res.send(recipes)
-        }
+    database.recipe.top((recipes) => {
+        res.send(recipes)
     })
 })
 
@@ -218,12 +206,8 @@ router.post('/report', (req, res) => {
 })
 
 router.post('/search', (req, res) => {
-    database.recipe.search(req.body.query, (err, results) => {
-        if (err) {
-            res.status(500).send()
-        } else {
-            res.send(results)
-        }
+    database.recipe.search(req.body.query, (results) => {
+        res.send(results)
     })
 })
 
@@ -234,12 +218,8 @@ router.post('/user', (req, res) => {
                 message: err ? err.message : 'Unauthorized'
             })
         } else {
-            database.recipe.user(req.body.id, (err, recipes) => {
-                if (err) {
-                    console.log(err)
-                } else {
-                    res.send(recipes)
-                }
+            database.recipe.user(req.body.id, (recipes) => {
+                res.send(recipes)
             })
         }
     })(req, res)
@@ -252,12 +232,8 @@ router.post('/liked', (req, res) => {
                 message: err ? err.message : 'Unauthorized'
             })
         } else {
-            database.recipe.liked(req.body.id, (err, recipes) => {
-                if (err) {
-                    console.log(err)
-                } else {
-                    res.send(recipes)
-                }
+            database.recipe.liked(req.body.id, (recipes) => {
+                res.send(recipes)
             })
         }
     })(req, res)
