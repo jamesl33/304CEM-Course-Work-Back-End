@@ -5,27 +5,23 @@ const config = require('../config.json')
 
 module.exports = {
     comment: async(user, comment) => {
-        try {
-            await new Promise((resolve) => {
-                const db = new sqlite(config.database.name)
-                const dbUser = db.prepare('select * from users where name = ?').get(user.name)
-                const previousId = db.prepare('select max(id) as previousId from comments').get()
+        await new Promise((resolve) => {
+            const db = new sqlite(config.database.name)
+            const dbUser = db.prepare('select * from users where name = ?').get(user.name)
+            const previousId = db.prepare('select max(id) as previousId from comments').get()
 
-                db.prepare('insert into comments values (?, ?, ?, ?, ?, ?)').run(
-                    previousId.previousId !== null ? previousId.previousId + 1 : 0,
-                    dbUser.id,
-                    Math.floor(new Date() / 1000),
-                    comment.recipeId,
-                    comment.comment,
-                    comment.parent ? comment.parent : null
-                )
+            db.prepare('insert into comments values (?, ?, ?, ?, ?, ?)').run(
+                previousId.previousId !== null ? previousId.previousId + 1 : 0,
+                dbUser.id,
+                Math.floor(new Date() / 1000),
+                comment.recipeId,
+                comment.comment,
+                comment.parent ? comment.parent : null
+            )
 
-                db.close()
+            db.close()
 
-                resolve()
-            })
-        } catch (error) {
-            console.log(error) // We shouldn't need to send this to the user. Hense no callback.
-        }
+            resolve()
+        })
     }
 }
