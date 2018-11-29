@@ -88,7 +88,7 @@ test('Test publishing a recipe', done => {
 })
 
 test('Load a recipe for editing as the owner', done => {
-    function callback(err, recipe) {
+    database.recipe.edit({ id: 0, name: 'James' }, 1, (err, recipe) => {
         expect(err).toBe(null)
         expect(recipe).toEqual({
             recipe: {
@@ -101,27 +101,120 @@ test('Load a recipe for editing as the owner', done => {
             published: 1
         })
         done()
-    }
-
-    database.recipe.edit({ id: 0, name: 'James' }, 1, callback)
+    })
 })
 
 test('Load a recipe for editing as a different user than the owener', done => {
-    function callback(err, recipe) {
+    database.recipe.edit({ id: 3, name: 'Martha' }, 1, (err, recipe) => {
         expect(err.message).toEqual('You don not have permission to edit this recipe')
         expect(recipe).toBe(undefined)
         done()
-    }
-
-    database.recipe.edit({ id: 3, name: 'Martha' }, 1, callback)
+    })
 })
 
 test('Attempt to edit a recipe that does not exist', done => {
-    function callback(err, recipe) {
+    database.recipe.edit({ id: 0, name: 'James' }, 999999, (err, recipe) => {
         expect(err.message).toEqual('Requested recipe does not exist')
         expect(recipe).toBe(undefined)
         done()
-    }
+    })
+})
 
-    database.recipe.edit({ id: 0, name: 'James' }, 999999, callback)
+test('Load a recipe', done => {
+    database.recipe.load({ id: 0, name: 'James' }, 0, (err, recipe) => {
+        expect(err).toBe(null)
+
+        // We can't just test the whole recipe since it is updated everytime we view it
+        expect(recipe.id).toEqual(0)
+        expect(recipe.createdBy).toEqual(3)
+        expect(recipe.title).toEqual('Shortbread')
+        expect(recipe.image).toEqual('public/images/uploads/35138f1d2693144aa14e1dd9040b9f7b')
+        expect(recipe.ingredients).toEqual('Butter, Flour')
+        expect(recipe.description).toEqual('Crispy shortbread')
+        expect(recipe.steps).toEqual('[{"description":"This is an example step without an image."},{"image":"public/images/uploads/4e619e04b43f5d4727f13a0df16b3ab7","description":"This is another example step but with an image."}]')
+        expect(recipe.liked).toEqual(true)
+        expect(recipe.likes).toEqual(2)
+        expect(recipe.reported).toEqual(0)
+        expect(recipe.comments).toEqual('[{"id":1,"createdBy":"Jess","createdOn":1543412764,"recipeId":0,"comment":"I made this and it tasted great!","parent":null}]')
+
+        done()
+    })
+})
+
+test('Attempt to load a recipe that does not exist', done => {
+    database.recipe.load({ id: 0, name: 'James' }, 999999, (err, recipe) => {
+        expect(err.message).toEqual('Requested recipe does not exist')
+        expect(recipe).toBe(undefined)
+        done()
+    })
+})
+
+test('Fetch the recent recipes', done => {
+    database.recipe.recent((err, recipes) => {
+        expect(err).toBe(null)
+        expect(recipes).toEqual([
+            { id: 3,
+              title: 'Apple Crumble',
+              image: 'public/images/uploads/12cd2734b476c7005769bb3b5676ae9d',
+              description: 'Crumbly and tasty' },
+            { id: 2,
+              title: 'Spaghetti Bolognese',
+              image: 'public/images/uploads/d8efdbc79ca1b5d91b398f1dc247a9a7',
+              description: 'Messy to eat; takes great' },
+            { id: 1,
+              title: 'Lasagna',
+              image: 'public/images/uploads/65fa7d7199e93aa38f3bb009836a8a9e',
+              description: 'Great tasting lasagna' },
+            { id: 0,
+              title: 'Shortbread',
+              image: 'public/images/uploads/35138f1d2693144aa14e1dd9040b9f7b',
+              description: 'Crispy shortbread' }
+        ])
+
+        done()
+    })
+})
+
+test('Fetch the top recipes', done => {
+    database.recipe.top((err, recipes) => {
+        expect(err).toBe(null)
+        expect(recipes).toEqual([
+            { id: 0,
+              title: 'Shortbread',
+              image: 'public/images/uploads/35138f1d2693144aa14e1dd9040b9f7b',
+              description: 'Crispy shortbread' },
+            { id: 1,
+              title: 'Lasagna',
+              image: 'public/images/uploads/65fa7d7199e93aa38f3bb009836a8a9e',
+              description: 'Great tasting lasagna' },
+            { id: 2,
+              title: 'Spaghetti Bolognese',
+              image: 'public/images/uploads/d8efdbc79ca1b5d91b398f1dc247a9a7',
+              description: 'Messy to eat; takes great' },
+            { id: 3,
+              title: 'Apple Crumble',
+              image: 'public/images/uploads/12cd2734b476c7005769bb3b5676ae9d',
+              description: 'Crumbly and tasty' }
+        ])
+
+        done()
+    })
+})
+
+test('Test searching for a recipe', done => {
+    database.recipe.search('Shortbread', (err, recipes) => {
+        expect(err).toBe(null)
+        expect(recipes).toEqual([
+            { id: 0,
+              title: 'Shortbread',
+              image: 'public/images/uploads/35138f1d2693144aa14e1dd9040b9f7b',
+              description: 'Crispy shortbread'},
+            { id: 4,
+              title: 'Shortbread',
+              image: 'public/images/uploads/7c0e650a998d91eaebcf2ea9f85f7242',
+              description: 'Crispy shortbread'}
+        ])
+
+        done()
+    })
 })

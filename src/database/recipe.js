@@ -159,7 +159,7 @@ module.exports = {
         try {
             const recipe = await new Promise((resolve, reject) => {
                 const db = new sqlite(config.database.name)
-                const dbUser = db.prepare('select * from users where name = ?').get(user.name)
+                const dbUser = db.prepare('select * from users where id = ?').get(user.id)
                 const dbRecipe = db.prepare('select * from recipes where id = ?').get(id)
                 const comments = db.prepare('select * from comments where recipeId = ?').all(id)
 
@@ -169,11 +169,11 @@ module.exports = {
                 })
 
                 if (!dbRecipe) {
-                    return reject(new Error('Requested recipe does not exit'))
+                    return reject(new Error('Requested recipe does not exist'))
                 }
 
                 if (!dbRecipe.published && dbUser.id != dbRecipe.createdBy) {
-                    return reject(new Error('Requested recipe does not exit'))
+                    return reject(new Error('Requested recipe does not exist'))
                 }
 
                 db.prepare('update recipes set viewCount = viewCount + 1 where id = ?').run(id) // Increment the view counter
@@ -186,7 +186,7 @@ module.exports = {
                     ingredients: dbRecipe.ingredients,
                     description: dbRecipe.description,
                     steps: dbRecipe.steps,
-                    liked: dbUser ? JSON.parse(dbUser.likedRecipes).includes(id) : undefined,
+                    liked: dbUser ? JSON.parse(dbUser.likedRecipes).includes(`${id}`) : undefined,
                     likes: dbRecipe.likeRating,
                     reported: dbRecipe.reported,
                     views: dbRecipe.viewCount + 1, // Add one because this row was collected before we incremented the viewCount column
@@ -332,11 +332,16 @@ module.exports = {
 
                 recipes.forEach(recipe => {
                     if (!(recipe in uniqueRecipes)) {
-                        uniqueRecipes.push(recipe)
+                        uniqueRecipes.push({
+                            id: recipe.id,
+                            title: recipe.title,
+                            image: recipe.image,
+                            description: recipe.description
+                        })
                     }
                 })
 
-                resolve(recipes)
+                resolve(uniqueRecipes)
             })
 
             done(null, results)
