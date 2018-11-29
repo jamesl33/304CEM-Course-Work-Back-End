@@ -86,3 +86,42 @@ test('Test publishing a recipe', done => {
 
     done()
 })
+
+test('Load a recipe for editing as the owner', done => {
+    function callback(err, recipe) {
+        expect(err).toBe(null)
+        expect(recipe).toEqual({
+            recipe: {
+                id: 1,
+                title: 'Lasagna',
+                description: 'Great tasting lasagna',
+                ingredients: 'Mince beef, Pasta slices, Cheese sauce',
+                steps: [ { description: 'This is an example step with an image.' }, { description: 'This is an example step without an image.' } ]
+            },
+            published: 1
+        })
+        done()
+    }
+
+    database.recipe.edit({ id: 0, name: 'James' }, 1, callback)
+})
+
+test('Load a recipe for editing as a different user than the owener', done => {
+    function callback(err, recipe) {
+        expect(err.message).toEqual('You don not have permission to edit this recipe')
+        expect(recipe).toBe(undefined)
+        done()
+    }
+
+    database.recipe.edit({ id: 3, name: 'Martha' }, 1, callback)
+})
+
+test('Attempt to edit a recipe that does not exist', done => {
+    function callback(err, recipe) {
+        expect(err.message).toEqual('Requested recipe does not exist')
+        expect(recipe).toBe(undefined)
+        done()
+    }
+
+    database.recipe.edit({ id: 0, name: 'James' }, 999999, callback)
+})

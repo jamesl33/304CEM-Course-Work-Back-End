@@ -43,17 +43,12 @@ module.exports = {
             const recipe = await new Promise((resolve, reject) => {
                 const db = new sqlite(config.database.name)
                 const dbRecipe = db.prepare('select * from recipes where id = ?').get(id)
-                const dbUser = db.prepare('select * from users where name = ?').get(user.name)
 
                 if (!dbRecipe) {
-                    return reject(new Error('Requested recipe does not exit'))
+                    return reject(new Error('Requested recipe does not exist'))
                 }
 
-                if (!dbUser) {
-                    return reject(new Error('Could not find user'))
-                }
-
-                if (dbRecipe.createdBy !== dbUser.id) {
+                if (dbRecipe.createdBy !== user.id) {
                     return reject(new Error('You don not have permission to edit this recipe'))
                 }
 
@@ -97,17 +92,12 @@ module.exports = {
             await new Promise((resolve, reject) => {
                 const db = new sqlite(config.database.name)
                 const dbRecipe = db.prepare('select * from recipes where id = ?').get(recipe.id)
-                const dbUser = db.prepare('select * from users where name = ?').get(user.name)
 
                 if (!dbRecipe) {
                     return reject(new Error('Requested recipe does not exit'))
                 }
 
-                if (!dbUser) {
-                    return reject(new Error('Could not find user'))
-                }
-
-                if (dbRecipe.id !== dbUser.id) {
+                if (dbRecipe.id !== user.id) {
                     return reject(new Error('You don not have permission to edit this recipe'))
                 }
 

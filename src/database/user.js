@@ -68,7 +68,7 @@ module.exports = {
     },
     profile: async(id, all, done) => {
         try {
-            const profile = await new Promise((resolve, reject) => {
+            const profile = await new Promise((resolve) => {
                 const db = new sqlite(config.database.name)
                 const dbUser = db.prepare('select name from users where id = ?').get(id)
                 let dbRecipes = []
