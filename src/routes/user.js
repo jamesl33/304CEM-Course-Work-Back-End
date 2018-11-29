@@ -70,7 +70,9 @@ router.post('/profile', (req, res) => {
         if (err || user === false) {
             database.user.profile(req.body.id, false, (err, profile) => {
                 if (err) {
-                    console.log(err)
+                    res.status(403).send({
+                        message: err ? err.message : 'Unauthorized'
+                    })
                 } else {
                     res.send(profile)
                 }
@@ -78,7 +80,9 @@ router.post('/profile', (req, res) => {
         } else {
             database.user.profile(req.body.id, true, (err, profile) => {
                 if (err) {
-                    console.log(err)
+                    res.status(403).send({
+                        message: err ? err.message : 'Unauthorized'
+                    })
                 } else {
                     res.send(profile)
                 }
