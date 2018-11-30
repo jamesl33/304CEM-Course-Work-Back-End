@@ -400,7 +400,7 @@ module.exports = {
             resolve(dbRecipes)
         })
 
-        done(null, recipes)
+        done(recipes)
     },
     /**
      * @description Load at random 5 of the users' liked recipes
@@ -433,6 +433,6 @@ module.exports = {
             resolve(recipeList)
         })
 
-        done(null, recipes)
+        done(recipes)
     }
 }
