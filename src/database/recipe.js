@@ -11,11 +11,10 @@ async function _save(user, recipe, publish) {
     await new Promise((resolve) => {
         const db = new sqlite(config.database.name)
         const previousId = db.prepare('select max(id) as previousId from recipes').get()
-        const dbUser = db.prepare('select * from users where name = ?').get(user.name)
 
         db.prepare('insert into recipes values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').run(
             previousId.previousId !== null ? previousId.previousId + 1 : 0,
-            dbUser.id,
+            user.id,
             Math.floor(new Date() / 1000),
             recipe.title,
             recipe.image,
@@ -414,7 +413,7 @@ module.exports = {
 
             let recipeList = []
 
-            if (likedRecipes.likedRecipes) {
+            if ((likedRecipes) && (likedRecipes.likedRecipes)) {
                 let recipes = JSON.parse(likedRecipes.likedRecipes)
                 recipes = recipes.sort(() => .5 - Math.random()) // Shuffle the liked list
                 recipes = recipes.slice(0, 5) // Get the first five recipe id's
