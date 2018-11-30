@@ -118,7 +118,7 @@ module.exports = {
                     return reject(new Error('Requested recipe does not exit'))
                 }
 
-                if (dbRecipe.id !== user.id) {
+                if (dbRecipe.createdBy !== user.id) {
                     return reject(new Error('You don not have permission to edit this recipe'))
                 }
 
