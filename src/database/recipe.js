@@ -6,6 +6,7 @@
 
 const sqlite = require('better-sqlite3')
 const config = require('../config.json')
+const _ = require('lodash');
 
 async function _save(user, recipe, publish) {
     await new Promise((resolve) => {
@@ -353,9 +354,9 @@ module.exports = {
     search: async(query, done) => {
         const results = await new Promise((resolve) => {
             const db = new sqlite(config.database.name)
-            const titleResults = db.prepare('select * from recipes where title like ?').all(query)
-            const descriptionResults = db.prepare('select * from recipes where description like ?').all(query)
-            const ingredientsResults = db.prepare('select * from recipes where ingredients like ?').all(query)
+            const titleResults = db.prepare('select * from recipes where title like ? and published = 1').all(`%${query}%`)
+            const descriptionResults = db.prepare('select * from recipes where description like ? and published = 1').all(`%${query}%`)
+            const ingredientsResults = db.prepare('select * from recipes where ingredients like ? and published = 1').all(`%${query}%`)
 
             db.close()
 
@@ -364,13 +365,15 @@ module.exports = {
             let uniqueRecipes = []
 
             recipes.forEach(recipe => {
-                if (!(recipe in uniqueRecipes)) {
-                    uniqueRecipes.push({
-                        id: recipe.id,
-                        title: recipe.title,
-                        image: recipe.image,
-                        description: recipe.description
-                    })
+                recipe = {
+                    id: recipe.id,
+                    title: recipe.title,
+                    image: recipe.image,
+                    description: recipe.description
+                }
+
+                if (!(_.find(uniqueRecipes, recipe))) {
+                    uniqueRecipes.push(recipe)
                 }
             })
 
