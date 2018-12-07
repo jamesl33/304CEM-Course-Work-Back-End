@@ -223,12 +223,6 @@ test('Test searching for a recipe', done => {
                 title: 'Shortbread',
                 image: 'public/images/uploads/35138f1d2693144aa14e1dd9040b9f7b',
                 description: 'Crispy shortbread'
-            },
-            {
-                id: 4,
-                title: 'Shortbread',
-                image: 'public/images/uploads/7c0e650a998d91eaebcf2ea9f85f7242',
-                description: 'Crispy shortbread'
             }
         ])
 
@@ -237,16 +231,14 @@ test('Test searching for a recipe', done => {
 })
 
 test('Ensure that we can get the users recipes', done => {
-    database.recipe.user(0, (err, recipes) => {
-        expect(err).toBe(null)
+    database.recipe.user(0, (recipes) => {
         expect(recipes)
         done()
     })
 })
 
 test('Ensure that we can get the users liked recipes', done => {
-    database.recipe.liked(0, (err, recipes) => {
-        expect(err).toBe(null)
+    database.recipe.liked(0, (recipes) => {
         expect(recipes)
         done()
     })
