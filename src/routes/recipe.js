@@ -68,18 +68,18 @@ router.post('/save', (req, res) => {
 /**
  * @name edit
  * @description Get a recipe in a from so that it can be edited
- * @route {POST} /edit
+ * @route {GET} /edit
  * @headerparam {String} authorization - The JWT provided when the user logged in
- * @bodyparam {String} id - The id of the recipe the user is trying to edit
+ * @queryparam {String} id - The id of the recipe the user is trying to edit
  */
-router.post('/edit', (req, res) => {
+router.get('/edit', (req, res) => {
     passport.authenticate('jwt', (err, user) => {
         if (err || user === false) {
             res.status(401).send({
                 message: err ? err.message : 'Unauthorized'
             })
         } else {
-            database.recipe.edit(user, req.body.id, (err, recipe) => {
+            database.recipe.edit(user, req.query.id, (err, recipe) => {
                 if (err) {
                     // The user doesn't have access to this recipe or it doesn't exist
                     res.status(403).send({
@@ -154,25 +154,25 @@ router.post('/update', (req, res) => {
 /**
  * @name togglePublished
  * @description Toggle the published flag for a recipe in the database
- * @route {POST} /publish/toggle
+ * @route {PUT} /publish/toggle
  * @headerparam {String} authorization - The JWT provided when the user logged in
- * @bodyparam {String} id - The id of the recipe which we want to operate on
+ * @queryparam {String} id - The id of the recipe which we want to operate on
  */
-router.post('/publish/toggle', (req, res) => {
+router.put('/publish/toggle', (req, res) => {
     passport.authenticate('jwt', (err, user) => {
         if (err || user === false) {
             res.status(401).send({
                 message: err ? err.message : 'Unauthorized'
             })
         } else {
-            database.recipe.togglePublished(user, req.body.id, (err) => {
+            database.recipe.togglePublished(user, req.query.id, (err) => {
                 if (err) {
                     res.status(401).send({
                         message: err.message
                     })
                 } else {
                     // Notify the user that the resource was updated successfully
-                    res.status(201).send()
+                    res.status(200).send()
                 }
             })
         }
@@ -182,17 +182,17 @@ router.post('/publish/toggle', (req, res) => {
 /**
  * @name load
  * @description Load a recipe so that it can be displayed
- * @route {POST} /load
- * @headerparam {String} authorization - The JWT provided when the user logged in
+ * @route {GET} /load
+ * @queryparam {String} authorization - The JWT provided when the user logged in
  * @bodyparam {String} id - The id of the recipe the user wants to view
  */
-router.post('/load', (req, res) => {
+router.get('/load', (req, res) => {
     passport.authenticate('jwt', (err, user) => {
         if (err) {
             console.log(err)
         }
 
-        database.recipe.load(user, req.body.id, (err, recipe) => {
+        database.recipe.load(user, req.query.id, (err, recipe) => {
             if (err) {
                 res.status(403).send({
                     message: err ? err.message : 'Unauthorized'
@@ -207,9 +207,9 @@ router.post('/load', (req, res) => {
 /**
  * @name recent
  * @description Load 5 of the most recent recipes
- * @route {POST} /recent
+ * @route {GET} /recent
  */
-router.post('/recent', (req, res) => {
+router.get('/recent', (req, res) => {
     // Since this is for the home page we don't need to authenticate
     database.recipe.recent((recipes) => {
         res.send(recipes)
@@ -219,9 +219,9 @@ router.post('/recent', (req, res) => {
 /**
  * @name top
  * @description Get the top 5 rated recipes
- * @route {POST}
+ * @route {GET}
  */
-router.post('/top', (req, res) => {
+router.get('/top', (req, res) => {
     // Since this is for the home page we don't need to authenticate
     database.recipe.top((recipes) => {
         res.send(recipes)
@@ -231,21 +231,21 @@ router.post('/top', (req, res) => {
 /**
  * @name like
  * @description Like a recipe in the database
- * @route {POST} /like
+ * @route {PUT} /like
  * @headerparam {String} authorization - The JWT provided when the user logged in
- * @bodyparam {String} id - The id of the recipe the user is liking
+ * @queryparam {String} id - The id of the recipe the user is liking
  */
-router.post('/like', (req, res) => {
+router.put('/like', (req, res) => {
     passport.authenticate('jwt', (err, user) => {
         if (err || user === false) {
             res.status(401).send({
                 message: err ? err.message : 'Unauthorized'
             })
         } else {
-            database.recipe.like(user, req.body.id)
+            database.recipe.like(user, req.query.id)
 
             // Notify the user that the resource was updated successfully
-            res.status(201).send()
+            res.status(200).send()
         }
     })(req, res)
 })
@@ -253,21 +253,21 @@ router.post('/like', (req, res) => {
 /**
  * @name unlike
  * @description Unlike a recipe in the database
- * @route {POST} /unlike
+ * @route {PUT} /unlike
  * @headerparam {String} authorization - The JWT provided when the user logged in
- * @bodyparam {String} id - The id of the recipe the user is liking
+ * @queryparam {String} id - The id of the recipe the user is liking
  */
-router.post('/unlike', (req, res) => {
+router.put('/unlike', (req, res) => {
     passport.authenticate('jwt', (err, user) => {
         if (err || user === false) {
             res.status(401).send({
                 message: err ? err.message : 'Unauthorized'
             })
         } else {
-            database.recipe.unlike(user, req.body.id)
+            database.recipe.unlike(user, req.query.id)
 
             // Notify the user that the resource was updated successfully
-            res.status(201).send()
+            res.status(200).send()
         }
     })(req, res)
 })
@@ -275,24 +275,24 @@ router.post('/unlike', (req, res) => {
 /**
  * @name report
  * @description Mark a recipe as reported
- * @route {POST} /report
- * @bodyparam {String} id - The id of the recipe which is being reported
+ * @route {PUT} /report
+ * @queryparam {String} id - The id of the recipe which is being reported
  */
-router.post('/report', (req, res) => {
-    database.recipe.report(req.body.id)
+router.put('/report', (req, res) => {
+    database.recipe.report(req.query.id)
 
     // Notify the user that the resource was updated successfully
-    res.status(201).send()
+    res.status(200).send()
 })
 
 /**
  * @name search
  * @description Search the database for a recipe
- * @route {POST} /search
- * @bodyparam {String} query - The search query
+ * @route {GET} /search
+ * @queryparam {String} query - The search query
  */
-router.post('/search', (req, res) => {
-    database.recipe.search(req.body.query, (results) => {
+router.get('/search', (req, res) => {
+    database.recipe.search(req.query.query, (results) => {
         res.send(results)
     })
 })
@@ -300,11 +300,11 @@ router.post('/search', (req, res) => {
 /**
  * @name user
  * @description Get 5 random recipes created a specific user
- * @route {POST}
- * @bodyparam {String} id - The of of the user
+ * @route {GET}
+ * @queryparam {String} id - The id of the user
  */
-router.post('/user', (req, res) => {
-    database.recipe.user(req.body.id, (recipes) => {
+router.get('/user', (req, res) => {
+    database.recipe.user(req.query.id, (recipes) => {
         res.send(recipes)
     })
 })
@@ -312,11 +312,11 @@ router.post('/user', (req, res) => {
 /**
  * @name liked
  * @description Get 5 random recipes liked by a specific user
- * @route {POST}
- * @bodyparam {String} id - The id of the user
+ * @route {GET}
+ * @queryparam {String} id - The id of the user
  */
-router.post('/liked', (req, res) => {
-    database.recipe.liked(req.body.id, (recipes) => {
+router.get('/liked', (req, res) => {
+    database.recipe.liked(req.query.id, (recipes) => {
         res.send(recipes)
     })
 })

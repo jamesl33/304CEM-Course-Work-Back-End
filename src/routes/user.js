@@ -61,14 +61,14 @@ router.post('/register', (req, res) => {
 /**
  * @name profile
  * @description Fetch a users profile
- * @route {POST} /profile
+ * @route {GET} /profile
  * @headerparam {String} authorization - The JWT provided when the user logged in
- * @bodyparam {Integer} id - The if of the users profile that you want to fetch
+ * @queryparam {Integer} id - The if of the users profile that you want to fetch
  */
-router.post('/profile', (req, res) => {
+router.get('/profile', (req, res) => {
     passport.authenticate('jwt', (err, user) => {
         if (err || user === false) {
-            database.user.profile(req.body.id, false, (err, profile) => {
+            database.user.profile(req.query.id, false, (err, profile) => {
                 if (err) {
                     res.status(403).send({
                         message: err ? err.message : 'Unauthorized'
@@ -78,7 +78,7 @@ router.post('/profile', (req, res) => {
                 }
             })
         } else {
-            database.user.profile(req.body.id, true, (err, profile) => {
+            database.user.profile(req.query.id, true, (err, profile) => {
                 if (err) {
                     res.status(403).send({
                         message: err ? err.message : 'Unauthorized'
