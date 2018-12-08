@@ -110,30 +110,11 @@
                             <table class="params">
                             <thead><tr><th>Method</th><th class="last">Path</th></tr></thead>
                             <tr>
-                            <td class="type">POST</td>
+                            <td class="type">GET</td>
                             <td class="name last">/edit</td>
                             </tr>
                             </table>
                             Get a recipe in a from so that it can be edited
-                            <h5>Body Parameters:</h5>
-          <table class="params">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Type</th>
-                
-                
-                <th class="last">Description</th>
-              </tr>
-            </thead>
-            <tr>
-            <td class="name">id</td>
-            <td class="type">String</td>
-            
-            
-            <td class="description last">The id of the recipe the user is trying to edit</td>
-          </tr>
-          </table>
                             <h5>Header Parameters:</h5>
           <table class="params">
             <thead>
@@ -151,6 +132,25 @@
             
             
             <td class="description last">The JWT provided when the user logged in</td>
+          </tr>
+          </table>
+                            <h5>Query Parameters:</h5>
+          <table class="params">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Type</th>
+                
+                
+                <th class="last">Description</th>
+              </tr>
+            </thead>
+            <tr>
+            <td class="name">id</td>
+            <td class="type">String</td>
+            
+            
+            <td class="description last">The id of the recipe the user is trying to edit</td>
           </tr>
           </table>
 </div>
@@ -218,30 +218,11 @@
                             <table class="params">
                             <thead><tr><th>Method</th><th class="last">Path</th></tr></thead>
                             <tr>
-                            <td class="type">POST</td>
+                            <td class="type">PUT</td>
                             <td class="name last">/like</td>
                             </tr>
                             </table>
                             Like a recipe in the database
-                            <h5>Body Parameters:</h5>
-          <table class="params">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Type</th>
-                
-                
-                <th class="last">Description</th>
-              </tr>
-            </thead>
-            <tr>
-            <td class="name">id</td>
-            <td class="type">String</td>
-            
-            
-            <td class="description last">The id of the recipe the user is liking</td>
-          </tr>
-          </table>
                             <h5>Header Parameters:</h5>
           <table class="params">
             <thead>
@@ -259,6 +240,25 @@
             
             
             <td class="description last">The JWT provided when the user logged in</td>
+          </tr>
+          </table>
+                            <h5>Query Parameters:</h5>
+          <table class="params">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Type</th>
+                
+                
+                <th class="last">Description</th>
+              </tr>
+            </thead>
+            <tr>
+            <td class="name">id</td>
+            <td class="type">String</td>
+            
+            
+            <td class="description last">The id of the recipe the user is liking</td>
           </tr>
           </table>
 </div>
@@ -298,7 +298,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="routes_recipe.js.html">routes/recipe.js</a>, <a href="routes_recipe.js.html#line232">line 232</a>
+        <a href="routes_recipe.js.html">routes/recipe.js</a>, <a href="routes_recipe.js.html#line231">line 231</a>
     </li></ul></dd>
     
 
@@ -326,12 +326,12 @@
                             <table class="params">
                             <thead><tr><th>Method</th><th class="last">Path</th></tr></thead>
                             <tr>
-                            <td class="type">POST</td>
+                            <td class="type">GET</td>
                             <td class="name last">undefined</td>
                             </tr>
                             </table>
                             Get 5 random recipes liked by a specific user
-                            <h5>Body Parameters:</h5>
+                            <h5>Query Parameters:</h5>
           <table class="params">
             <thead>
               <tr>
@@ -387,7 +387,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="routes_recipe.js.html">routes/recipe.js</a>, <a href="routes_recipe.js.html#line313">line 313</a>
+        <a href="routes_recipe.js.html">routes/recipe.js</a>, <a href="routes_recipe.js.html#line312">line 312</a>
     </li></ul></dd>
     
 
@@ -415,7 +415,7 @@
                             <table class="params">
                             <thead><tr><th>Method</th><th class="last">Path</th></tr></thead>
                             <tr>
-                            <td class="type">POST</td>
+                            <td class="type">GET</td>
                             <td class="name last">/load</td>
                             </tr>
                             </table>
@@ -439,7 +439,7 @@
             <td class="description last">The id of the recipe the user wants to view</td>
           </tr>
           </table>
-                            <h5>Header Parameters:</h5>
+                            <h5>Query Parameters:</h5>
           <table class="params">
             <thead>
               <tr>
@@ -655,7 +655,7 @@
                             <table class="params">
                             <thead><tr><th>Method</th><th class="last">Path</th></tr></thead>
                             <tr>
-                            <td class="type">POST</td>
+                            <td class="type">GET</td>
                             <td class="name last">/recent</td>
                             </tr>
                             </table>
@@ -725,12 +725,12 @@
                             <table class="params">
                             <thead><tr><th>Method</th><th class="last">Path</th></tr></thead>
                             <tr>
-                            <td class="type">POST</td>
+                            <td class="type">PUT</td>
                             <td class="name last">/report</td>
                             </tr>
                             </table>
                             Mark a recipe as reported
-                            <h5>Body Parameters:</h5>
+                            <h5>Query Parameters:</h5>
           <table class="params">
             <thead>
               <tr>
@@ -786,7 +786,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="routes_recipe.js.html">routes/recipe.js</a>, <a href="routes_recipe.js.html#line276">line 276</a>
+        <a href="routes_recipe.js.html">routes/recipe.js</a>, <a href="routes_recipe.js.html#line275">line 275</a>
     </li></ul></dd>
     
 
@@ -946,12 +946,12 @@
                             <table class="params">
                             <thead><tr><th>Method</th><th class="last">Path</th></tr></thead>
                             <tr>
-                            <td class="type">POST</td>
+                            <td class="type">GET</td>
                             <td class="name last">/search</td>
                             </tr>
                             </table>
                             Search the database for a recipe
-                            <h5>Body Parameters:</h5>
+                            <h5>Query Parameters:</h5>
           <table class="params">
             <thead>
               <tr>
@@ -1007,7 +1007,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="routes_recipe.js.html">routes/recipe.js</a>, <a href="routes_recipe.js.html#line289">line 289</a>
+        <a href="routes_recipe.js.html">routes/recipe.js</a>, <a href="routes_recipe.js.html#line288">line 288</a>
     </li></ul></dd>
     
 
@@ -1035,30 +1035,11 @@
                             <table class="params">
                             <thead><tr><th>Method</th><th class="last">Path</th></tr></thead>
                             <tr>
-                            <td class="type">POST</td>
+                            <td class="type">PUT</td>
                             <td class="name last">/publish/toggle</td>
                             </tr>
                             </table>
                             Toggle the published flag for a recipe in the database
-                            <h5>Body Parameters:</h5>
-          <table class="params">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Type</th>
-                
-                
-                <th class="last">Description</th>
-              </tr>
-            </thead>
-            <tr>
-            <td class="name">id</td>
-            <td class="type">String</td>
-            
-            
-            <td class="description last">The id of the recipe which we want to operate on</td>
-          </tr>
-          </table>
                             <h5>Header Parameters:</h5>
           <table class="params">
             <thead>
@@ -1076,6 +1057,25 @@
             
             
             <td class="description last">The JWT provided when the user logged in</td>
+          </tr>
+          </table>
+                            <h5>Query Parameters:</h5>
+          <table class="params">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Type</th>
+                
+                
+                <th class="last">Description</th>
+              </tr>
+            </thead>
+            <tr>
+            <td class="name">id</td>
+            <td class="type">String</td>
+            
+            
+            <td class="description last">The id of the recipe which we want to operate on</td>
           </tr>
           </table>
 </div>
@@ -1143,7 +1143,7 @@
                             <table class="params">
                             <thead><tr><th>Method</th><th class="last">Path</th></tr></thead>
                             <tr>
-                            <td class="type">POST</td>
+                            <td class="type">GET</td>
                             <td class="name last">undefined</td>
                             </tr>
                             </table>
@@ -1185,7 +1185,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="routes_recipe.js.html">routes/recipe.js</a>, <a href="routes_recipe.js.html#line220">line 220</a>
+        <a href="routes_recipe.js.html">routes/recipe.js</a>, <a href="routes_recipe.js.html#line219">line 219</a>
     </li></ul></dd>
     
 
@@ -1213,30 +1213,11 @@
                             <table class="params">
                             <thead><tr><th>Method</th><th class="last">Path</th></tr></thead>
                             <tr>
-                            <td class="type">POST</td>
+                            <td class="type">PUT</td>
                             <td class="name last">/unlike</td>
                             </tr>
                             </table>
                             Unlike a recipe in the database
-                            <h5>Body Parameters:</h5>
-          <table class="params">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Type</th>
-                
-                
-                <th class="last">Description</th>
-              </tr>
-            </thead>
-            <tr>
-            <td class="name">id</td>
-            <td class="type">String</td>
-            
-            
-            <td class="description last">The id of the recipe the user is liking</td>
-          </tr>
-          </table>
                             <h5>Header Parameters:</h5>
           <table class="params">
             <thead>
@@ -1254,6 +1235,25 @@
             
             
             <td class="description last">The JWT provided when the user logged in</td>
+          </tr>
+          </table>
+                            <h5>Query Parameters:</h5>
+          <table class="params">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Type</th>
+                
+                
+                <th class="last">Description</th>
+              </tr>
+            </thead>
+            <tr>
+            <td class="name">id</td>
+            <td class="type">String</td>
+            
+            
+            <td class="description last">The id of the recipe the user is liking</td>
           </tr>
           </table>
 </div>
@@ -1293,7 +1293,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="routes_recipe.js.html">routes/recipe.js</a>, <a href="routes_recipe.js.html#line254">line 254</a>
+        <a href="routes_recipe.js.html">routes/recipe.js</a>, <a href="routes_recipe.js.html#line253">line 253</a>
     </li></ul></dd>
     
 
@@ -1453,12 +1453,12 @@
                             <table class="params">
                             <thead><tr><th>Method</th><th class="last">Path</th></tr></thead>
                             <tr>
-                            <td class="type">POST</td>
+                            <td class="type">GET</td>
                             <td class="name last">undefined</td>
                             </tr>
                             </table>
                             Get 5 random recipes created a specific user
-                            <h5>Body Parameters:</h5>
+                            <h5>Query Parameters:</h5>
           <table class="params">
             <thead>
               <tr>
@@ -1474,7 +1474,7 @@
             <td class="type">String</td>
             
             
-            <td class="description last">The of of the user</td>
+            <td class="description last">The id of the user</td>
           </tr>
           </table>
 </div>
@@ -1514,7 +1514,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="routes_recipe.js.html">routes/recipe.js</a>, <a href="routes_recipe.js.html#line301">line 301</a>
+        <a href="routes_recipe.js.html">routes/recipe.js</a>, <a href="routes_recipe.js.html#line300">line 300</a>
     </li></ul></dd>
     
 
@@ -1554,7 +1554,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Nov 29 2018 20:22:29 GMT+0000 (GMT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Dec 08 2018 14:21:21 GMT+0000 (GMT)
 </footer>
 
 <script> prettyPrint(); </script>
