@@ -102,8 +102,10 @@ module.exports = {
     update: async(user, recipe, done) => {
         function newSteps(originalSteps, newSteps) {
             for (let i = 0; i < newSteps.length; i++) {
-                if (newSteps[i].image === undefined) {
-                    newSteps[i].image = originalSteps[i].image
+                if (i < originalSteps.length) {
+                    if ((newSteps[i].image === undefined) && originalSteps[i].image !== undefined) {
+                        newSteps[i].image = originalSteps[i].image
+                    }
                 }
             }
 
